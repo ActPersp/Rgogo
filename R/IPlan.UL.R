@@ -271,7 +271,7 @@ setMethod(
       } else {
          premAdj <- GetAssump(premAssump, cov, object, ApplyPremMargin(resultContainer$.ArgSet))
       }
-      isPayable <- ((((1:covMonths) - 1) %% (12 / premMode) == 0) * ((1:covMonths) <= premMonths))
+      isPayable <- ((((1:covMonths) - 1) %% (12 / GetPremMode(cov)) == 0) * ((1:covMonths) <= premMonths))
       projPrem <- modPrem * premAdj * isPayable
       projMinPrem <- modMinPrem * isPayable
       # Determine projected minimum premium and excess premium
@@ -297,7 +297,7 @@ setMethod(
       ovrdOnExsComm <- GetOvrdOnCommSchd2(object, cov) * resultContainer$Proj$Comm.Exs
       resultContainer$Proj$Comm.Ovrd.Min <- ovrdOnMinPrem + ovrdOnMinComm
       resultContainer$Proj$Comm.Ovrd.Exs <- ovrdOnExsPrem + ovrdOnExsComm
-      resultContainer$Proj$Comm.Ovrd <- resultContainer$Proj$Comm.Ovrd.Min + resultContainer$Comm.Ovrd.Exs
+      resultContainer$Proj$Comm.Ovrd <- resultContainer$Proj$Comm.Ovrd.Min + resultContainer$Proj$Comm.Ovrd.Exs
       return(resultContainer)
    }
 )
@@ -317,8 +317,7 @@ setMethod(
       # Get cost of insurance charge rate
       coiTable <- GetCOITable(object, cov)
       if (!is.null(coiTable)) {
-         coiRate <- rep(LookUp(coiTable, cov), each = 12) / 12     # Monthly cost of insurance charge rate
-         length(coiRate) <- covMonths
+         coiRate <- rep(LookUp(coiTable, cov, len = ceiling(covMonths / 12)), each = 12, length.out = covMonths) / 12     # Monthly cost of insurance charge rate
       } else {
          coiRate <- rep(0, length.out = covMonths)
       }
@@ -332,25 +331,28 @@ setMethod(
          i <- ifelse(i < iMin, iMin, i)
       }
       j <- (1 + i) ^ (1 / 12) - 1
-      projStartPolMonth <- GetProjPolMonths(result$Timeline)[1]
+      if (is.null(resultContainer$Timeline)) {
+         projStartPolMonth <- 1
+      } else {
+         projStartPolMonth <- GetProjPolMonths(resultContainer$Timeline)[1]
+      }
       # Project fund
-      accBal <- GetAccBal(cov)
-      fundAdj <- iCred <- fundBeg <- fundEnd <- expnsChrg <- coi <- naar <- rep(0, covMonths)
+      covAccBal <- GetAccBal(cov)
+      fundAdj <- iCred <- fundBeg <- fundEnd <- coi <- naar <- rep(0, covMonths)
       expnsChrgTiming <- GetExpnsChrgTiming(object)
       expnsChrgType <- GetExpnsChrgType(object)
       resultContainer$.ProjEndPolMonth <- covMonths
       for (t in 1:covMonths) {
          fundBeg[t] <- ifelse(t == 1, 0, fundEnd[t - 1])
-         fundBeg[t] <- fundBeg[t] + expnsChrg[t] * (expnsChrgTiming == 0) * ifelse(expnsChrgType == 0, 1, fundBeg[t])
-         openBal <- fundBeg[t] + prem[t] + premLoad[t]
-         # Calculate net amount at risk and cost of insurance
+         # fundBeg[t] <- fundBeg[t] + expnsChrg[t] * (expnsChrgTiming == 0) * ifelse(expnsChrgType == 0, 1, fundBeg[t])
+         # openBal <- fundBeg[t] + prem[t] + premLoad[t]
          naar[t] <- GetFaceAmt(cov)     # Net amount at risk of type B UL is equal to face amount.
          coi[t] <- -naar[t] * coiRate[t]
          openBal <- fundBeg[t] + prem[t] + premLoad[t] + expnsChrg[t] * (expnsChrgTiming == 0) + coi[t]
          iCred[t] <- openBal * j[t]
          fundEnd[t] <- openBal + iCred[t]
          fundEnd[t] <- fundEnd[t] + expnsChrg[t] * (expnsChrgTiming == 1) * ifelse(expnsChrgType == 0L, 1, fundEnd[t])
-         fundAdj[t] <- (accBal - fundEnd[t]) * (t == projStartPolMonth)
+         fundAdj[t] <- ifelse(HasValue(covAccBal), (covAccBal - fundEnd[t]) * (t == projStartPolMonth), 0)
          fundEnd[t] <- fundEnd[t] + fundAdj[t]
          if (t >=  projStartPolMonth & fundEnd[t] < 0) {
             resultContainer$.ProjEndPolMonth <- t
@@ -362,6 +364,7 @@ setMethod(
       resultContainer$Proj$Fund.PremLoad.ExsPrem <- exsPremLoad
       resultContainer$Proj$Fund.PremLoad <- premLoad
       resultContainer$Proj$Fund.ExpnsChrg <- expnsChrg
+      resultContainer$Proj$Fund.COI <- coi
       resultContainer$Proj$Fund.IntrCred <- iCred
       resultContainer$Proj$Fund.Adj <- fundAdj
       resultContainer$Proj$Fund <- fundEnd

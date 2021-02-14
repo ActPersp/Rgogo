@@ -96,10 +96,13 @@ setMethod(
 setMethod(
    f = "LookUp",
    signature (tbl = "Table.IA", lookUpKey = "Cov"),
-   definition = function(tbl, lookUpKey, ...) {
+   definition = function(tbl, lookUpKey, len = NA_integer_) {
       issAge <- as.character(GetIssAge(lookUpKey))
       stopifnot(all(issAge %in% dimnames(tbl@TValue)[[1]]))
       v <- as.vector(tbl@TValue[issAge,1]) / tbl@TBase
+      if(!is.na(len)) {
+         v <- rep(v, length.out = len)
+      }
       names(v) <- NULL
       return(v)
    }
