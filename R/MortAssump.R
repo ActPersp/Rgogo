@@ -329,7 +329,7 @@ setMethod(
 )
 
 .Get_q_Margin <- function(object, cov, plan, assumpInfo, projStartDate) {
-   # Warning: in order to run this methode, GetExpdAssum method must be run first and the results are stored in assumpInfo.
+   # Warning: in order to run this method, GetExpdAssum method must be run first and the results are stored in assumpInfo.
    # Determine margin for adverse deviation
    margin <- GetMargin(object, cov, plan)
    if (margin != 0) {

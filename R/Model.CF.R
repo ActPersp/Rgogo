@@ -329,7 +329,7 @@ setMethod(
 )
 
 ExportToExcel.Cf <- function(result, annual, digits = integer(), wb = NULL, sheetName) {
-   df <- result$Cf
+   df <- data.frame(result$Cf)
    if (annual == TRUE) {
       dfOutput <- data.frame(Timeline = GetYearStartValue(df[, "Timeline"]), stringsAsFactors = FALSE)
    } else {
@@ -337,7 +337,7 @@ ExportToExcel.Cf <- function(result, annual, digits = integer(), wb = NULL, shee
    }
    dfOutput <- data.frame(Timeline = ifelse(annual == TRUE, GetYearStartValue(df[, "Timeline"]), df[, "Timeline"]), stringsAsFactors = FALSE)
    cnames <- names(df)
-   for (cname in cnames[cnames != "Timeline"]) {
+   for (cname in cnames[!cnames %in% c("Timeline", "CovId")]) {
       v <- df[, cname]
       if (any(v != 0)) {
          if (annual == TRUE) {
@@ -359,7 +359,7 @@ ExportToExcel.Cf <- function(result, annual, digits = integer(), wb = NULL, shee
 }
 
 ExportToExcel.Proj <- function(result, annual, digits = integer(), wb = NULL, sheetName) {
-   df <- result$Proj
+   df <- data.frame(result$Proj)
    if (annual == TRUE) {
       dfOutput <- data.frame(Timeline = GetYearStartValue(df[, "Timeline"]), stringsAsFactors = FALSE)
    } else {
@@ -368,7 +368,7 @@ ExportToExcel.Proj <- function(result, annual, digits = integer(), wb = NULL, sh
    cnames <- names(df)
    for (cname in cnames[cnames != "Timeline"]) {
       v <- df[, cname]
-      if (any(v != 0)) {
+      if (any(v != 0, na.rm = TRUE)) {
          if (annual == TRUE) {
             v <- switch (cname,
                          Prem = GetYearlyTotal(v),
@@ -398,7 +398,8 @@ ExportToExcel.Proj <- function(result, annual, digits = integer(), wb = NULL, sh
                          AdminChrg = GetYearlyTotal(v),
                          Expns.Acq = GetYearlyTotal(v),
                          Expns.Mnt = GetYearlyTotal(v),
-                         rep(NA, length.out = length(tLabel))
+                         # rep(NA, length.out = length(tLabel))
+                         NA
             )
          }
          dfOutput <- eval(expr = parse(text = paste0("cbind(dfOutput, data.frame(", cname, " = v, stringsAsFactors = FALSE))")))

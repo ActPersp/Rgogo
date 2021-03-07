@@ -92,7 +92,9 @@ setMethod(
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
          WriteTable.ValuSumm(conn, valuSumm)
-         if (!is.null(cf)) {
+         cfProjYears <- GetMaxProjYears(object)
+         if (!is.null(cf) & cfProjYears > 0) {
+            cf <- cf[1:(cfProjYears * 12),]
             WriteTable.Cf(conn, cf)
          }
          CompactDb(conn)

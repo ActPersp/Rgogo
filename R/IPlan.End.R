@@ -164,10 +164,7 @@ setMethod(
    f = "ProjSurChrg",
    signature = "IPlan.End",
    definition = function(object, cov, resultContainer) {
-      surChrg <- resultContainer$Proj$CV * GetSurChrgSchd(object, cov)
-      if (!all(surChrg == 0)) {
-         resultContainer$Proj$Chrg.Sur <- surChrg
-      }
+      resultContainer$Proj$Chrg.Sur <- resultContainer$Proj$CV * GetSurChrgSchd(object, cov)
       return(resultContainer)
    }
 )
@@ -176,12 +173,10 @@ setMethod(
    f = "ProjSurBen",
    signature = "IPlan.End",
    definition = function(object, cov, resultContainer) {
-      if (is.null(resultContainer$Proj$Chrg.Sur)) {
-         surBen <- resultContainer$Proj$CV
-      } else {
-         surBen <- resultContainer$Proj$CV - resultContainer$Proj$Chrg.Sur
-      }
-      resultContainer$Proj$Ben.Sur <- ifelse(surBen > 0, surBen, 0)
+      resultContainer <- ProjSurChrg(object, cov, resultContainer)
+      surBen <- resultContainer$Proj$CV - resultContainer$Proj$Chrg.Sur
+      surBen <- ifelse(surBen > 0, surBen, 0)
+      resultContainer$Proj$Ben.Sur <- surBen
       return(resultContainer)
    }
 )

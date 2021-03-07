@@ -52,6 +52,7 @@ Collate:
     'ExpnsAssump.R'
     'GenCode.R'
     'IJob.R'
+    'Job.CfProj.R'
     'Job.PfadAnlys.R'
     'IPlan.LT.R'
     'IPlan.End.R'

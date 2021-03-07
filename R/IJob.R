@@ -163,7 +163,7 @@ setMethod(
          result <- Finalize(object, result)
          jobEndTime <- Sys.time()
          AddMessage(msg) <- paste0("Job ends at: ", jobEndTime <- Sys.time())
-         AddMessage(msg) <- paste0("Time lapsed: ", round(as.double(difftime(jobEndTime, jobStartTime, units = "min")), digits = 3), " min")
+         AddMessage(msg) <- paste0("Time elapsed: ", round(as.double(difftime(jobEndTime, jobStartTime, units = "min")), digits = 3), " min")
          cat(GetMessage(msg), sep = "\n")
          invisible(result)
       }
@@ -214,7 +214,7 @@ setMethod(
       result <- Finalize(object, result)
       jobEndTime <- Sys.time()
       AddMessage(msg) <- paste0("Job ends at: ", jobEndTime <- Sys.time())
-      AddMessage(msg) <- paste0("Time lapsed: ", round(as.double(difftime(jobEndTime, jobStartTime, units = "min")), digits = 3), " min")
+      AddMessage(msg) <- paste0("Time elapsed: ", round(as.double(difftime(jobEndTime, jobStartTime, units = "min")), digits = 3), " min")
       cat(GetMessage(msg), sep = "\n")
       invisible(result)
    }

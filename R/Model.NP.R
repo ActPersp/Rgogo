@@ -12,12 +12,11 @@ setMethod(
    definition = function(object, var, result) {
       result$CovData <- var
       result$.ArgSet <- GetArgs(object)
-      return(Run.NP(object, GetPlan(var), var, result))
+      return(Run(object, GetPlan(var), var, result))
    }
 )
 
 setMethod(
-   # f = "Run.NP",
    f = "Run",
    signature = c("Model.NP", "IPlan", "Cov"),
    definition = function(object, var, cov, result) {

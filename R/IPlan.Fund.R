@@ -561,7 +561,6 @@ setMethod(
          prem <- rep(0, length.out = covMonths)
       }
       premLoad <- -prem * GetPremLoadSchd(object, cov)
-      expnsChrg <- -GetExpnsChrgSchd(object, cov)
 
       # Get interest credit rate
       iMin <- GetMinIntrCredRate(object, cov)
@@ -573,9 +572,12 @@ setMethod(
          i <- ifelse(i < iMin, iMin, i)
       }
       j <- (1 + i) ^ (1 / 12) - 1
+
+      # Start fund projection
       projStartPolMonth <- GetProjPolMonths(resultContainer$Timeline)[1]
       accBal <- GetAccBal(cov)
-      fundAdj <- iCred <- fundBeg <- fundEnd <- expnsChrg <- rep(0, covMonths)
+      fundAdj <- iCred <- fundBeg <- fundEnd <- rep(0, covMonths)
+      expnsChrg <- -GetExpnsChrgSchd(object, cov)
       expnsChrgTiming <- GetExpnsChrgTiming(object)
       expnsChrgType <- GetExpnsChrgType(object)
       resultContainer$.ProjEndPolMonth <- covMonths

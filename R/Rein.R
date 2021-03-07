@@ -166,7 +166,7 @@ setMethod(
    f = "GetMinReinAmt",
    signature = "IRein",
    definition = function(object, cov = NULL) {
-      if (is.null(cov) | length(object@MinReinAmt == 1)) {
+      if (is.null(cov) | length(object@MinReinAmt) == 1) {
          return(object@MinReinAmt)
       } else {
          return(object@MinReinAmt[GetRiskClass(object, cov)])
@@ -310,8 +310,8 @@ setMethod(
       # Determine reinsured proportion
       if (!HasValue(reinProp <- GetReinProp(cov))) {
          faceAmt <- GetFaceAmt(cov)
-         cedAmt <- faceAmt - min(faceAmt * GetRetnProp(object), GetRetnLimit(object))
-         reinProp <- cedAmt * (cedAmt >= GetMinReinAmt(object)) / faceAmt
+         cedAmt <- faceAmt - min(faceAmt * GetRetnProp(object, cov), GetRetnLimit(object, cov))
+         reinProp <- cedAmt * (cedAmt >= GetMinReinAmt(object, cov)) / faceAmt
       }
       # Project retention and reinsured Naar
       resultContainer <- ProjNaar(object, cov, resultContainer)

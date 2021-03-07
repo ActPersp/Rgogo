@@ -19,7 +19,6 @@ setMethod(
 )
 
 setMethod(
-   # f = "Run.NFB",
    f = "Run",
    signature = c("Model.NFB", "IPlan", "Cov"),
    definition = function(object, var, cov, result) {

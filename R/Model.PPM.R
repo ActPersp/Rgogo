@@ -109,8 +109,9 @@ ExportToExcel.Model.PPM <- function(result, dir, annual = TRUE, digits = 0, over
       wb <- .ExportPPMResultToExcel.ValuSumm(wb, result, digits)
       wb <- ExportToExcel.Proj(result, annual, digits, wb, sheetName = "Proj")
       wb <- ExportToExcel.Cf(result, annual, digits, wb, sheetName = "Cf")
-      wb <- .ExportPPMResultToExcel.ProjRes(wb, result, annual, digits)
-      wb <- .ExportPPMResultToExcel.Assump(wb, result)
+      # wb <- .ExportPPMResultToExcel.ProjRes(wb, result, annual, digits)
+      wb <- .ExportPPMResultToExcel.Assump(wb, result, sheetName = "Assump")
+      wb <- .ExportPPMResultToExcel.PV(wb, result, sheetName = "PV")
       openxlsx::saveWorkbook(wb, filePath, overwrite = TRUE)
       return(TRUE)
    }
@@ -166,11 +167,11 @@ ExportToExcel.Model.PPM <- function(result, dir, annual = TRUE, digits = 0, over
    r <- r + 1
    openxlsx::writeData(wb, sheet = sheetName, x = "Reserve Summary", startCol = 1, startRow = (r <- r + 1))
    openxlsx::writeData(wb, sheet = sheetName, x = "Gross Reserve:", startCol = 1, startRow = (r <- r + 1))
-   openxlsx::writeData(wb, sheet = sheetName, x = round(data$Res.Gross, digits), startCol = 2, startRow = r)
+   openxlsx::writeData(wb, sheet = sheetName, x = round(data$GrossRes, digits), startCol = 2, startRow = r)
    openxlsx::writeData(wb, sheet = sheetName, x = "Ceded Reserve:", startCol = 1, startRow = (r <- r + 1))
-   openxlsx::writeData(wb, sheet = sheetName, x = round(data$Res.Rein, digits), startCol = 2, startRow = r)
+   openxlsx::writeData(wb, sheet = sheetName, x = round(data$ReinRes, digits), startCol = 2, startRow = r)
    openxlsx::writeData(wb, sheet = sheetName, x = "Net Reserve:", startCol = 1, startRow = (r <- r + 1))
-   openxlsx::writeData(wb, sheet = sheetName, x = round(data$Res.Net, digits), startCol = 2, startRow = r)
+   openxlsx::writeData(wb, sheet = sheetName, x = round(data$NetRes, digits), startCol = 2, startRow = r)
    r <- r + 1
    openxlsx::writeData(wb, sheet = sheetName, x = "Present Value of Cashflow Summary:", startCol = 1, startRow = (r <- r + 1))
    if (!is.null(value <- data$Pv.Prem)) {
@@ -248,3 +249,18 @@ ExportToExcel.Model.PPM <- function(result, dir, annual = TRUE, digits = 0, over
    openxlsx::setColWidths(wb, sheet = sheetName, cols = (1:2), widths = c(30, 10))
    return(wb)
 }
+
+.ExportPPMResultToExcel.Assump <- function(wb, result, sheetName = "Assump") {
+   sht <- openxlsx::addWorksheet(wb, sheetName)
+   openxlsx::writeDataTable(wb, sht, data.frame(result$Assump))
+   return(wb)
+}
+
+.ExportPPMResultToExcel.PV <- function(wb, result, sheetName = "PV") {
+   sht <- openxlsx::addWorksheet(wb, sheetName)
+   openxlsx::writeDataTable(wb, sht, data.frame(result$PV))
+   return(wb)
+}
+
+
+

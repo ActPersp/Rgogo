@@ -282,15 +282,11 @@ setMethod(
       if (is.null(resultContainer$Proj$CV)) {
          return(resultContainer)
       } else {
-         if (is.null(resultContainer$Proj$Chrg.Sur)) {
-            resultContainer$Proj$Ben.Sur <- resultContainer$Proj$CV
-         } else {
-            resultContainer$Proj$Ben.Sur <- resultContainer$Proj$CV - resultContainer$Proj$Chrg.Sur
-            resultContainer$Proj$Ben.Sur <- ifelse(resultContainer$Proj$Ben.Sur >= 0, resultContainer$Proj$Ben.Sur, 0)
-         }
+         resultContainer <- ProjSurChrg(object, cov, resultContainer)
+         resultContainer$Proj$Ben.Sur <- resultContainer$Proj$CV - resultContainer$Proj$Chrg.Sur
+         resultContainer$Proj$Ben.Sur <- ifelse(resultContainer$Proj$Ben.Sur >= 0, resultContainer$Proj$Ben.Sur, 0)
          return(resultContainer)
       }
-      return(resultContainer)
    }
 )
 

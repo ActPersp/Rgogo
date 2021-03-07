@@ -142,17 +142,23 @@ setMethod(
 setMethod(
    f = "LookUp",
    signature (tbl = "Table.AABY", lookUpKey = "Cov"),
-   definition = function(tbl, lookUpKey, len = NA_integer_) {
+   definition = function(tbl, lookUpKey, len = NA_integer_, valueIfNA = NA) {
       issAge <- GetIssAge(lookUpKey)
       birthYear <- as.character(as.numeric(format(GetIssDate(lookUpKey), "%Y")) - issAge)
-      if (is.na(len)) {
-         attAge <- as.character(issAge:GetMaxAge(tbl))
-      } else {
-         attAge <- as.character(issAge:(issAge + len - 1))
-      }
-      stopifnot(all(attAge %in% dimnames(tbl@TValue)[[1]]))
-      stopifnot(all(birthYear %in% dimnames(tbl@TValue)[[2]]))
+      # if (is.na(len)) {
+      #    attAge <- as.character(issAge:GetMaxAge(tbl))
+      # } else {
+      #    attAge <- as.character(issAge:(issAge + len - 1))
+      # }
+      attAge <- as.character(issAge:GetMaxAge(tbl))
       v <- tbl@TValue[attAge, birthYear] / tbl@TBase
+      if (!is.na(len)) {
+         length(v) <- len
+         v <- ifelse(is.na(v), valueIfNA, v)
+      }
+      # stopifnot(all(attAge %in% dimnames(tbl@TValue)[[1]]))
+      # stopifnot(all(birthYear %in% dimnames(tbl@TValue)[[2]]))
+      # v <- tbl@TValue[attAge, birthYear] / tbl@TBase
       names(v) <- NULL
       return(v)
    }
