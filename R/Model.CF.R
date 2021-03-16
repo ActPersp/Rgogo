@@ -335,7 +335,12 @@ ExportToExcel.Cf <- function(result, annual, digits = integer(), wb = NULL, shee
    } else {
       dfOutput <- data.frame(Timeline = df[, "Timeline"], stringsAsFactors = FALSE)
    }
-   dfOutput <- data.frame(Timeline = ifelse(annual == TRUE, GetYearStartValue(df[, "Timeline"]), df[, "Timeline"]), stringsAsFactors = FALSE)
+   # dfOutput <- data.frame(Timeline = ifelse(annual == TRUE, GetYearStartValue(df[, "Timeline"]), df[, "Timeline"]), stringsAsFactors = FALSE)
+   if (annual == TRUE) {
+      dfOutput <- data.frame(Timeline = GetYearStartValue(df[, "Timeline"]), stringsAsFactors = FALSE)
+   } else {
+      dfOutput <- data.frame(Timeline = df[, "Timeline"], stringsAsFactors = FALSE)
+   }
    cnames <- names(df)
    for (cname in cnames[!cnames %in% c("Timeline", "CovId")]) {
       v <- df[, cname]

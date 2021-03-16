@@ -51,6 +51,10 @@ setMethod(
       }
       # Summarize results
       result$ValuSumm <- .SumrzResult.Model.PPM(object, var, result)
+      len <- min(length(result$Cf[[1]]), GetCfExportYears(args) * 12, na.rm = TRUE)
+      for (i in seq_along(length(result$Cf))) {
+            length(result$Cf[[i]]) <- len
+      }
       return(result)
    }
 )

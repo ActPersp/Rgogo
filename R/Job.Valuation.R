@@ -2,7 +2,7 @@ setClass(
    Class = "Job.Valuation",
    contains = "IJob",
    slots = c(
-      MaxProjYears = "integer",
+      # MaxProjYears = "integer",
       DbAppend = "logical"
    )
 )
@@ -14,7 +14,7 @@ Job.Valuation <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, maxProjYears 
       Dispatcher = dispatcher,
       DbDriver = dbDrvr,
       DbConnArgs = dbConnArgs,
-      MaxProjYears = as.integer(maxProjYears),
+      # MaxProjYears = as.integer(maxProjYears),
       DbAppend = dbAppend,
       Descrip = as.character(descrip)
    )
@@ -26,13 +26,13 @@ setValidity(
    Class = "Job.Valuation",
    method = function(object) {
       err <- New.SysMessage()
-      isValid <- Validate(
-         ValidatorGroup(
-            Validator.Length(minLen = 1, maxLen = 1),
-            Validator.Range(minValue = 0, maxValue = 100)
-         ),
-         object@MaxProjYears
-      )
+      # isValid <- Validate(
+      #    ValidatorGroup(
+      #       Validator.Length(minLen = 1, maxLen = 1),
+      #       Validator.Range(minValue = 0, maxValue = 100)
+      #    ),
+      #    object@MaxProjYears
+      # )
       if (NoMessage(err)) {
          return(TRUE)
       } else {
@@ -41,23 +41,23 @@ setValidity(
    }
 )
 
-setMethod(
-   f = "GetMaxProjYears",
-   signature = "Job.Valuation",
-   definition = function(object) {
-      return(object@MaxProjYears)
-   }
-)
+# setMethod(
+#    f = "GetMaxProjYears",
+#    signature = "Job.Valuation",
+#    definition = function(object) {
+#       return(object@MaxProjYears)
+#    }
+# )
 
-setMethod(
-   f = "SetMaxProjYears<-",
-   signature = "Job.Valuation",
-   definition = function(object, value) {
-      object@MaxProjYears <- as.integer(value)
-      validObject(object)
-      return(object)
-   }
-)
+# setMethod(
+#    f = "SetMaxProjYears<-",
+#    signature = "Job.Valuation",
+#    definition = function(object, value) {
+#       object@MaxProjYears <- as.integer(value)
+#       validObject(object)
+#       return(object)
+#    }
+# )
 
 setMethod(
    f = "Initialize",
@@ -92,9 +92,10 @@ setMethod(
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
          WriteTable.ValuSumm(conn, valuSumm)
-         cfProjYears <- GetMaxProjYears(object)
-         if (!is.null(cf) & cfProjYears > 0) {
-            cf <- cf[1:(cfProjYears * 12),]
+         # cfProjYears <- GetMaxProjYears(object)
+         # if (!is.null(cf) & cfProjYears > 0) {
+         if (!is.null(cf)) {
+            # cf <- cf[1:(cfProjYears * 12),]
             WriteTable.Cf(conn, cf)
          }
          CompactDb(conn)

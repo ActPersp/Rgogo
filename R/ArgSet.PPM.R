@@ -3,7 +3,8 @@ setClass(
    contains = "ArgSet.DCF",
    slots = c(
       ValuDate = "Date",
-      ResFloor = "numeric"
+      ResFloor = "numeric",
+      CfExportYears = "integer"
    )
 )
 
@@ -18,6 +19,16 @@ setValidity(
       isValid <- Validate(Validator.Length(minLen = 1, maxLen = 1), object@ResFloor)
       if(isValid != TRUE) {
          AddMessage(err) <- "Value of slot '@ResFloor' must be of length 1."
+      }
+      isValid <- Validate(
+         ValidatorGroup(
+            Validator.Length(minLen = 1, maxLen = 1),
+            Validator.Range(minValue = 0, maxValue = 100, allowNA = TRUE)
+         ),
+         object@CfExportYears
+      )
+      if(isValid != TRUE) {
+         AddMessage(err) <- "Invalid cash flow export years.  It must be an integer scalar between 0 and 100."
       }
       if (NoMessage(err)) {
          return(TRUE)
@@ -37,6 +48,7 @@ ArgSet.PPM <- function(valuDate = as.Date("1899-12-31"),
                        applyExpnsMargin = TRUE,
                        applyIntrMargin = TRUE,
                        reserveFloor = -Inf,
+                       cfExportYears = NA_integer_,
                        id = character(0L),
                        descrip = character(0L)) {
    arg <- new(
@@ -52,6 +64,7 @@ ArgSet.PPM <- function(valuDate = as.Date("1899-12-31"),
       ApplyExpnsMargin = as.logical(applyExpnsMargin),
       ApplyIntrMargin = as.logical(applyIntrMargin),
       ResFloor = as.numeric(reserveFloor),
+      CfExportYears = cfExportYears,
       Descrip = as.character(descrip)
    )
    SetArgSetId(arg) <- as.character(id)
@@ -123,3 +136,20 @@ setMethod(
    }
 )
 
+setMethod(
+   f = "GetCfExportYears",
+   signature = "ArgSet.PPM",
+   definition = function(object) {
+      return(object@CfExportYears)
+   }
+)
+
+setMethod(
+   f = "SetCfExportYears<-",
+   signature = "ArgSet.PPM",
+   definition = function(object, value) {
+      object@CfExportYears <- as.integer(value)
+      validObject(object)
+      return(object)
+   }
+)
