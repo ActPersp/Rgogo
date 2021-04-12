@@ -276,7 +276,16 @@ setMethod(
       # } else {
       #    cfAnuBen <- rep(0, length.out = projLen)
       # }
+
       # Projected expenses and projected expense cashflows
+
+      if (!is.null(result$.ProjEndPolMonth)) {
+         v <- (seq_along(ae) +covMonths - covProjLen) <= result$.ProjEndPolMonth
+         ae <- ae * v
+         me <- me * v
+      }
+
+
       result$Proj$Expns.Acq = c(rep(NA, covMonths - covProjLen), ae[(projLen - covProjLen + 1):projLen])
       result$Proj$Expns.Mnt = c(rep(NA, covMonths - covProjLen), me[(projLen - covProjLen + 1):projLen])
       cfAcqExpns <- -ae * c(rep(0, length.out = projLen - covProjLen), pn[projPolMonths])

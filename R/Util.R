@@ -281,7 +281,11 @@ IsListOfList <- function(x) {
 To.data.frame <- function(x, itemName, colNames = NA_character_) {
    stopifnot(IsListOfList(x))
    rslt <- list()
-   cols <- names(x[[1]][[itemName]])
+   # cols <- names(x[[1]][[itemName]])     # This will not work if the first element of x does not contain the specified item named itemName.
+   for (i in 1:length(x)) {
+      cols <- names(x[[i]][[itemName]])
+      if (!is.null(cols)) break
+   }
    for (col in cols) {
       eval(expr = parse(text = paste0("s", col, "<-c(", paste0("x[[", 1:length(x), "]][[itemName]]$", col, collapse = ","),")")))
       eval(expr = parse(text = paste0("rslt$", col, "<-s", col)))

@@ -3,11 +3,12 @@ setClass(
    contains = "IJob",
    slots = c(
       # MaxProjYears = "integer",
-      DbAppend = "logical"
+      DbAppend = "logical",
+      DbSaveCf = "logical"
    )
 )
 
-Job.Valuation <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, maxProjYears = 20L, dbAppend = FALSE, id, descrip = character(0L)) {
+Job.Valuation <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, dbSaveCf = TRUE, dbAppend = FALSE, id, descrip = character(0L), ...) {
    job <- new(
       Class = "Job.Valuation",
       InpVars = inpVars,
@@ -16,6 +17,7 @@ Job.Valuation <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, maxProjYears 
       DbConnArgs = dbConnArgs,
       # MaxProjYears = as.integer(maxProjYears),
       DbAppend = dbAppend,
+      DbSaveCf = dbSaveCf,
       Descrip = as.character(descrip)
    )
    SetJobId(job) <- as.character(id)
@@ -93,8 +95,8 @@ setMethod(
       if (!is.null(conn)) {
          WriteTable.ValuSumm(conn, valuSumm)
          # cfProjYears <- GetMaxProjYears(object)
-         # if (!is.null(cf) & cfProjYears > 0) {
-         if (!is.null(cf)) {
+         if (!is.null(cf) & object@DbSaveCf) {
+         # if (!is.null(cf)) {
             # cf <- cf[1:(cfProjYears * 12),]
             WriteTable.Cf(conn, cf)
          }

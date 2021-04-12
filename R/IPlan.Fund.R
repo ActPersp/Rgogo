@@ -63,7 +63,7 @@ setValidity(
          ), object@ExpnsChrgTiming
       )
       if (isValid != TRUE) {
-         AddMessage(err) <- "Invaid expense charge mode.  It must be 0 (beginning of period) or 1 (end of period)."
+         AddMessage(err) <- "Invaid expense charge timing.  It must be 0 (beginning of period) or 1 (end of period)."
       }
       # Validate @ExpnsChrgType: 0L - dollar amount; 1L: percent of fund balance.
       isValid <- Validate(
@@ -75,11 +75,11 @@ setValidity(
       if (isValid != TRUE) {
          AddMessage(err) <- "Invaid expense charge type.  It must be 0 (dollar amount) or 1 (percent of fund balance)."
       }
-      # Validate @SurChrgSchd
-      isValid <- Validate(Validator.Range(minValue = 0, maxValue = 1), object@SurChrgSchd)
-      if (isValid != TRUE) {
-         AddMessage(err) <- "Invalid surrender charge schedule.  The rates must be between 0 and 1."
-      }
+      # # Validate @SurChrgSchd
+      # isValid <- Validate(Validator.Range(minValue = 0, maxValue = 1), object@SurChrgSchd)
+      # if (isValid != TRUE) {
+      #    AddMessage(err) <- "Invalid surrender charge schedule.  The rates must be between 0 and 1."
+      # }
       # Validate @PremTaxRate
       isValid <- Validate(
          ValidatorGroup(
@@ -93,7 +93,7 @@ setValidity(
       if (NoMessage(err)) {
          return(TRUE)
       } else {
-         return(GetMessage)
+         return(GetMessage(err))
       }
    }
 )
@@ -472,9 +472,10 @@ setMethod(
          prem <- rep(0, length.out = covMonths)
       }
       premTax <- prem * GetPremTaxRate(object, cov)
-      if (!all(prem == 0)) {
-         resultContainer$Proj$Prem <- prem
-      }
+      # if (!all(prem == 0)) {
+      #    resultContainer$Proj$Prem <- prem
+      # }
+      resultContainer$Proj$Prem <- prem
       if (!all(premTax == 0)) {
          resultContainer$Proj$Prem.Tax <- premTax
       }
@@ -599,7 +600,7 @@ setMethod(
       resultContainer$Proj$Fund.ExpnsChrg <- expnsChrg
       resultContainer$Proj$Fund.IntrCred <- iCred
       resultContainer$Proj$Fund.Adj <- fundAdj
-      resultContainer$Proj$Fund <- fundEnd
+      resultContainer$Proj$Fund <- resultContainer$Proj$CV <- fundEnd
       return(resultContainer)
    }
 )

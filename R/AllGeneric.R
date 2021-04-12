@@ -431,3 +431,5 @@ setGeneric(name = "GetValue", def = function(object) {standardGeneric("GetValue"
 
 setGeneric(name = "GetCfExportYears", def = function(object) {standardGeneric("GetCfExportYears")})
 setGeneric(name = "SetCfExportYears<-", def = function(object, value) {standardGeneric("SetCfExportYears<-")})
+setGeneric(name = "GetCorridor", def = function(object) {standardGeneric("GetCorridor")})
+setGeneric(name = "SetCorridor<-", def = function(object, value) {standardGeneric("SetCorridor<-")})

@@ -22,11 +22,16 @@ setMethod(
       # Run discounted cash flow model to calculate reserves.
       model.dcf <- Model.DCF(args)
       result1 <- Run(model.dcf, var, result)
+      # result1$Res <- list(
+      #    Res.Gross = max(-result1$PV$Total.Gross, resFloor),
+      #    Res.Rein = -result1$PV$Total.Rein
+      # )
+      # result1$Res$Res.Net <- max(result1$Res$Res.Gross + result1$Res$Res.Rein, resFloor)
       result1$Res <- list(
          Res.Gross = max(-result1$PV$Total.Gross, resFloor),
-         Res.Rein = -result1$PV$Total.Rein
+         Res.Net = max(-result1$PV$Total.Net, resFloor)
       )
-      result1$Res$Res.Net <- max(result1$Res$Res.Gross + result1$Res$Res.Rein, resFloor)
+      result1$Res$Res.Rein = result1$Res$Res.Net - result1$Res$Res.Gross
       # Re-run by reversing lapse margin if necessary
       lapseAssump <- GetArgValue(model.dcf, "LapseAssump")
       if (!is.null(lapseAssump) & GetArgValue(object, "ApplyLapseMargin")) {
@@ -35,11 +40,16 @@ setMethod(
          SetMargin(lapseAssump) <- -lapseMargin
          model.dcf <- SetArgValue(model.dcf, LapseAssump = lapseAssump)
          result2 <- Run(model.dcf, var, result)
+         # result2$Res <- list(
+         #    Res.Gross = max(-result2$PV$Total.Gross, resFloor),
+         #    Res.Rein = -result2$PV$Total.Rein
+         # )
+         # result2$Res$Res.Net <- max(result2$Res$Res.Gross + result2$Res$Res.Rein, resFloor)
          result2$Res <- list(
             Res.Gross = max(-result2$PV$Total.Gross, resFloor),
-            Res.Rein = -result2$PV$Total.Rein
+            Res.Net = max(-result2$PV$Total.Net, resFloor)
          )
-         result2$Res$Res.Net <- max(result2$Res$Res.Gross + result2$Res$Res.Rein, resFloor)
+         result2$Res$Res.Rein = result2$Res$Res.Net - result2$Res$Res.Gross
          result2$.LapseMarginUsed <- -lapseMargin
          if (result2$Res$Res.Net[1] > result1$Res$Res.Net[1]) {
             result <- result2

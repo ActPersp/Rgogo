@@ -293,10 +293,15 @@ setMethod(
    f = "ProjNaar",
    signature = "Rein",
    definition = function(object, cov, resultContainer) {
-      if(is.null(resultContainer$Proj$CV)){
+      if(!is.null(resultContainer$Proj$CV)) {
+         cv <- resultContainer$Proj$CV
+      } else {
+         cv <- resultContainer$Proj$Fund
+      }
+      if(is.null(cv)){
          cv <- 0
       } else {
-         cv <- ShiftRight(resultContainer$Proj$CV, positions = 1, filler = 0)
+         cv <- ShiftRight(cv, positions = 1, filler = 0)
       }
       resultContainer$Proj$Naar = resultContainer$Proj$Ben.Dth - cv
       return(resultContainer)
