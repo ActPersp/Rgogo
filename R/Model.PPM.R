@@ -22,11 +22,16 @@ setMethod(
       # Run discounted cash flow model to calculate reserves.
       model.dcf <- Model.DCF(args)
       result1 <- Run(model.dcf, var, result)
+      # result1$Res <- list(
+      #    Res.Gross = max(-result1$PV$Total.Gross, resFloor),
+      #    Res.Rein = -result1$PV$Total.Rein
+      # )
+      # result1$Res$Res.Net <- max(result1$Res$Res.Gross + result1$Res$Res.Rein, resFloor)
       result1$Res <- list(
          Res.Gross = max(-result1$PV$Total.Gross, resFloor),
-         Res.Rein = -result1$PV$Total.Rein
+         Res.Net = max(-result1$PV$Total.Net, resFloor)
       )
-      result1$Res$Res.Net <- max(result1$Res$Res.Gross + result1$Res$Res.Rein, resFloor)
+      result1$Res$Res.Rein = result1$Res$Res.Net - result1$Res$Res.Gross
       # Re-run by reversing lapse margin if necessary
       lapseAssump <- GetArgValue(model.dcf, "LapseAssump")
       if (!is.null(lapseAssump) & GetArgValue(object, "ApplyLapseMargin")) {
@@ -35,11 +40,16 @@ setMethod(
          SetMargin(lapseAssump) <- -lapseMargin
          model.dcf <- SetArgValue(model.dcf, LapseAssump = lapseAssump)
          result2 <- Run(model.dcf, var, result)
+         # result2$Res <- list(
+         #    Res.Gross = max(-result2$PV$Total.Gross, resFloor),
+         #    Res.Rein = -result2$PV$Total.Rein
+         # )
+         # result2$Res$Res.Net <- max(result2$Res$Res.Gross + result2$Res$Res.Rein, resFloor)
          result2$Res <- list(
             Res.Gross = max(-result2$PV$Total.Gross, resFloor),
-            Res.Rein = -result2$PV$Total.Rein
+            Res.Net = max(-result2$PV$Total.Net, resFloor)
          )
-         result2$Res$Res.Net <- max(result2$Res$Res.Gross + result2$Res$Res.Rein, resFloor)
+         result2$Res$Res.Rein = result2$Res$Res.Net - result2$Res$Res.Gross
          result2$.LapseMarginUsed <- -lapseMargin
          if (result2$Res$Res.Net[1] > result1$Res$Res.Net[1]) {
             result <- result2
@@ -51,6 +61,10 @@ setMethod(
       }
       # Summarize results
       result$ValuSumm <- .SumrzResult.Model.PPM(object, var, result)
+      len <- min(length(result$Cf[[1]]), GetCfExportYears(args) * 12, na.rm = TRUE)
+      for (i in seq_along(length(result$Cf))) {
+            length(result$Cf[[i]]) <- len
+      }
       return(result)
    }
 )
@@ -109,8 +123,9 @@ ExportToExcel.Model.PPM <- function(result, dir, annual = TRUE, digits = 0, over
       wb <- .ExportPPMResultToExcel.ValuSumm(wb, result, digits)
       wb <- ExportToExcel.Proj(result, annual, digits, wb, sheetName = "Proj")
       wb <- ExportToExcel.Cf(result, annual, digits, wb, sheetName = "Cf")
-      wb <- .ExportPPMResultToExcel.ProjRes(wb, result, annual, digits)
-      wb <- .ExportPPMResultToExcel.Assump(wb, result)
+      # wb <- .ExportPPMResultToExcel.ProjRes(wb, result, annual, digits)
+      wb <- .ExportPPMResultToExcel.Assump(wb, result, sheetName = "Assump")
+      wb <- .ExportPPMResultToExcel.PV(wb, result, sheetName = "PV")
       openxlsx::saveWorkbook(wb, filePath, overwrite = TRUE)
       return(TRUE)
    }
@@ -166,11 +181,11 @@ ExportToExcel.Model.PPM <- function(result, dir, annual = TRUE, digits = 0, over
    r <- r + 1
    openxlsx::writeData(wb, sheet = sheetName, x = "Reserve Summary", startCol = 1, startRow = (r <- r + 1))
    openxlsx::writeData(wb, sheet = sheetName, x = "Gross Reserve:", startCol = 1, startRow = (r <- r + 1))
-   openxlsx::writeData(wb, sheet = sheetName, x = round(data$Res.Gross, digits), startCol = 2, startRow = r)
+   openxlsx::writeData(wb, sheet = sheetName, x = round(data$GrossRes, digits), startCol = 2, startRow = r)
    openxlsx::writeData(wb, sheet = sheetName, x = "Ceded Reserve:", startCol = 1, startRow = (r <- r + 1))
-   openxlsx::writeData(wb, sheet = sheetName, x = round(data$Res.Rein, digits), startCol = 2, startRow = r)
+   openxlsx::writeData(wb, sheet = sheetName, x = round(data$ReinRes, digits), startCol = 2, startRow = r)
    openxlsx::writeData(wb, sheet = sheetName, x = "Net Reserve:", startCol = 1, startRow = (r <- r + 1))
-   openxlsx::writeData(wb, sheet = sheetName, x = round(data$Res.Net, digits), startCol = 2, startRow = r)
+   openxlsx::writeData(wb, sheet = sheetName, x = round(data$NetRes, digits), startCol = 2, startRow = r)
    r <- r + 1
    openxlsx::writeData(wb, sheet = sheetName, x = "Present Value of Cashflow Summary:", startCol = 1, startRow = (r <- r + 1))
    if (!is.null(value <- data$Pv.Prem)) {
@@ -248,3 +263,18 @@ ExportToExcel.Model.PPM <- function(result, dir, annual = TRUE, digits = 0, over
    openxlsx::setColWidths(wb, sheet = sheetName, cols = (1:2), widths = c(30, 10))
    return(wb)
 }
+
+.ExportPPMResultToExcel.Assump <- function(wb, result, sheetName = "Assump") {
+   sht <- openxlsx::addWorksheet(wb, sheetName)
+   openxlsx::writeDataTable(wb, sht, data.frame(result$Assump))
+   return(wb)
+}
+
+.ExportPPMResultToExcel.PV <- function(wb, result, sheetName = "PV") {
+   sht <- openxlsx::addWorksheet(wb, sheetName)
+   openxlsx::writeDataTable(wb, sht, data.frame(result$PV))
+   return(wb)
+}
+
+
+

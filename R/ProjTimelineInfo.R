@@ -19,10 +19,8 @@ ProjTimelineInfo <- function(projStartDate, cov, plan = GetPlan(cov)) {
    covMonths <- GetCovMonths(plan, cov)
    covTimeline <- GetIssDate(cov) %m+% months(0:(covMonths))
    covProjTimeIndex <- lubridate::interval(projStartDate, covTimeline) / months(1)
-   # covProjLen <- sum(covProjTimeIndex >= 0)
-   # projLen <- covProjLen + ifelse(GetIssDate(cov) > projStartDate, floor(covProjTimeIndex[1]), 0)
-   # projTimeline <- projStartDate %m+% months(0:(projLen - 1))
    covProjLen <- sum(covProjTimeIndex > -1) - 1
+   # covProjLen <- sum(covProjTimeIndex >= 0)
    projLen <- covProjLen + ifelse(GetIssDate(cov) > projStartDate, ceiling(covProjTimeIndex[1]), 0)
    projTimeline <- projStartDate %m+% months(0:(projLen - 1))
    projPolMonths = rev((covMonths:1)[1:covProjLen])

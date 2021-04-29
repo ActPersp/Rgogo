@@ -13,6 +13,7 @@ ArgSet.PPM.Fund <- function(valuDate = as.Date("1899-12-31"),
                            applyIntrMargin = TRUE,
                            applyPremMargin = TRUE,
                            reserveFloor = -Inf,
+                           cfExportYears = NA_integer_,
                            id = character(0L),
                            descrip = character(0L)) {
    arg <- new(
@@ -31,6 +32,7 @@ ArgSet.PPM.Fund <- function(valuDate = as.Date("1899-12-31"),
       ApplyIntrMargin = as.logical(applyIntrMargin),
       ApplyPremMargin = as.logical(applyPremMargin),
       ResFloor = as.numeric(reserveFloor),
+      CfExportYears = cfExportYears,
       Descrip = as.character(descrip)
    )
    SetArgSetId(arg) <- as.character(id)

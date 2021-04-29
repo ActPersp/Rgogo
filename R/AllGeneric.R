@@ -347,8 +347,8 @@ setGeneric(name = "WriteTable.ValuSumm", def = function(conn, data, ...) {standa
 setGeneric(name = "WriteTable.Cf", def = function(conn, data, ...) {standardGeneric("WriteTable.Cf")})
 setGeneric(name = "WriteTable.Pfad", def = function(conn, data, ...) {standardGeneric("WriteTable.Pfad")})
 setGeneric(name = "DeleteRows", def = function(conn, tableName, where) {standardGeneric("DeleteRows")})
-setGeneric(name = "GetMaxProjYears", def = function(object) {standardGeneric("GetMaxProjYears")})
-setGeneric(name = "SetMaxProjYears<-", def = function(object, value) {standardGeneric("SetMaxProjYears<-")})
+# setGeneric(name = "GetMaxProjYears", def = function(object) {standardGeneric("GetMaxProjYears")})
+# setGeneric(name = "SetMaxProjYears<-", def = function(object, value) {standardGeneric("SetMaxProjYears<-")})
 setGeneric(name = "CompactDb", def = function(conn) {standardGeneric("CompactDb")})
 setGeneric(name = "ConnectDb", def = function(object, ...) {standardGeneric("ConnectDb")})
 setGeneric(name = "DisconnectDb", def = function(object) {standardGeneric("DisconnectDb")})
@@ -429,3 +429,7 @@ setGeneric(name = "SetCOITable<-", def = function(object, value) {standardGeneri
 setGeneric(name = "SetConstId<-", def = function(object, value) {standardGeneric("SetConstId<-")})
 setGeneric(name = "GetValue", def = function(object) {standardGeneric("GetValue")})
 
+setGeneric(name = "GetCfExportYears", def = function(object) {standardGeneric("GetCfExportYears")})
+setGeneric(name = "SetCfExportYears<-", def = function(object, value) {standardGeneric("SetCfExportYears<-")})
+setGeneric(name = "GetCorridor", def = function(object) {standardGeneric("GetCorridor")})
+setGeneric(name = "SetCorridor<-", def = function(object, value) {standardGeneric("SetCorridor<-")})

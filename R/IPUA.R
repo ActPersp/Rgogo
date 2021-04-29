@@ -7,6 +7,7 @@ setClass(
       PUASchd = "numeric",
       PUACredMonth = "integer",
       CVTable = "character",
+      SurChrgSchd = "numeric",
       HasDthBen = "logical",
       HasMatBen = "logical",
       HasSurBen = "logical"
@@ -99,6 +100,14 @@ setMethod(
    signature = "IPUA",
    definition = function(object, cov) {
       return(round(GetCovYears(object, cov) * 12, digits = 0))
+   }
+)
+
+setMethod(
+   f = "GetRiskClass",
+   signature = "IPUA",
+   definition = function(object, cov) {
+      return(GetRiskClass(cov))
    }
 )
 
@@ -264,8 +273,9 @@ setMethod(
          projStartDate <- GetProjStartDate(resultContainer$.ArgSet)
       }
       puaRate <- GetPUASchd(object, cov)
-      # covMonths <- GetCovMonths(cov)
-      # timeLine <- GetIssDate(cov) %m+% months(0:covMonths)
+      covMonths <- GetCovMonths(cov)
+      timeLine <- GetIssDate(cov) %m+% months(1:covMonths)
+      # timeLine <- GetIssDate(cov) %m+% months(0:(covMonths - 1))
       # puaSchd <- object@PUASchd[as.character(lubridate::year(timeLine))] * (timeLine >= projStartDate)
       # puaRate <- ifelse(is.na(puaSchd), 0, puaSchd) *
       #    (lubridate::month(timeLine) == object@PUACredMonth) *
@@ -296,7 +306,7 @@ setMethod(
       if (HasMatBen(object)) {
          pua <- resultContainer$Proj$PUA
          covMonths <- GetCovMonths(object, cov)
-         matBen <- c(rep(0, covMonths), resultContainer$Proj$PUA[covMonths + 1])
+         matBen <- c(rep(0, (covMonths - 1)), resultContainer$Proj$PUA[covMonths])
          resultContainer$Proj$Ben.Mat.PUA <- matBen
       }
       return(resultContainer)
@@ -329,7 +339,7 @@ setMethod(
    f = "Project",
    signature = "IPUA",
    definition = function(object, cov, resultContainer) {
-      resultContainer <- NewProjection(resultContainer, cov, object)
+      # resultContainer <- NewProjection(resultContainer, cov, object)
       resultContainer <- ProjPUA(object, cov, resultContainer)
       resultContainer <- ProjDthBen(object, cov, resultContainer)
       resultContainer <- ProjMatBen(object, cov, resultContainer)

@@ -42,7 +42,8 @@ setValidity(
       }
       # Validate @AEPerPol
       if (length(object@AEPerPol) > 1) {
-         v <- Validator.Names(hasNames = TRUE, namesAllowed = as.character(0:100))
+         # v <- Validator.Names(hasNames = TRUE, namesAllowed = as.character(0:100))
+         v <- Validator.Names(hasNames = TRUE)
       } else {
          v <- Validator.Names(hasNames = FALSE)
       }

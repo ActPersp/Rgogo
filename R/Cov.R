@@ -489,11 +489,12 @@ setMethod(
    f = "GetAccBal",
    signature = "Cov",
    definition = function(object) {
-      if (HasValue(object@AccBal)) {
-         return(object@AccBal)
-      } else {
-         return(0)
-      }
+      return(object@AccBal)
+      # if (HasValue(object@AccBal)) {
+      #    return(object@AccBal)
+      # } else {
+      #    return(0)
+      # }
    }
 )
 setMethod(
