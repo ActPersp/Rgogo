@@ -16,6 +16,12 @@ setValidity(
       if(isValid != TRUE) {
          AddMessage(err) <- "Value of slot '@ValuDate' must be of length 1."
       }
+      # @ValuDate: must be the last day of a calendar month
+      if (!is.na(object@ValuDate)) {
+         if (lubridate::day(object@ValuDate + lubridate::days(1)) != 1) {
+            AddMessage(err) <- "Valuation date must be the last day of a calendar month."
+         }
+      }
       isValid <- Validate(Validator.Length(minLen = 1, maxLen = 1), object@ResFloor)
       if(isValid != TRUE) {
          AddMessage(err) <- "Value of slot '@ResFloor' must be of length 1."
