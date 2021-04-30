@@ -81,12 +81,7 @@ Convert_qx <- function(qx, m, method) {
 }
 
 DeployObject <- function(pkgName, objectType, overwrite = FALSE) {
-   # Check if the package has been installed.  Throw error if it is not isntalled.
-   if (!(pkgName %in% installed.packages())) return(paste0("Deployment cancelled.  Package '", pkgName, "' is not installed."))
-   # Check if the package is attached  If not, load the package temporarily.
-   wasAttached <- pkgName %in% .packages()
-   if(!wasAttached) eval(expr = parse(text = paste0("require(", pkgName, ")")))
-   # Identify all objects in the package which match the project type.
+   # # Identify all objects in the package which match the project type.
    funcList <- strsplit(eval(expr = parse(text = paste0("ls('package:", pkgName, "', pattern = '", paste0('^New.', objectType, '.'), "')"))), " ")
    if (length(funcList) == 0) return(paste0(objectType,": nothing to deploy."))
    # Save the identified objects as Rda data.
@@ -102,19 +97,18 @@ DeployObject <- function(pkgName, objectType, overwrite = FALSE) {
                    } else if (GetId(obj) != objName) {
                       stop(paste0("Object deployed by function ", funcName, " has an inconsistent identifier ", GetId(obj)))
                    }
-                   eval(expr = parse(text = "SaveAsRda(obj, overwrite = TRUE)"))
+                   cat("-- Deploying", objName, "\n")
+                   eval(expr = parse(text = paste0(objName, " <- obj" )))
+                   eval(expr = parse(text = paste0("save(", objName, ", file = 'data/", objName, ".rda')")))
                 }
              }
           }, pkgName, overwrite
    )
-   # If the package was not attached originally, unload it.
-   if(!wasAttached) eval(expr = parse(text = paste0("detach('package:", pkgName, "', unload = TRUE)")))
-   return("Done.  Remember to rebuild the package before using any new Rda files.")
 }
 
 DeployProject <- function(pkgName, overwrite = FALSE) {
-   cat("Start project deployment...\n")
-   devtools::install(quiet = TRUE)
+   cat("Start deploying project", pkgName, "...\n")
+   devtools::load_all(export_all = FALSE)
    DeployObject(pkgName, "Plan", overwrite)
    DeployObject(pkgName, "MortAssump", overwrite)
    DeployObject(pkgName, "LapseAssump", overwrite)
@@ -127,8 +121,11 @@ DeployProject <- function(pkgName, overwrite = FALSE) {
    DeployObject(pkgName, "ArgSet", overwrite)
    DeployObject(pkgName, "Model", overwrite)
    DeployObject(pkgName, "Const", overwrite)
-   devtools::install(vignettes = FALSE, quiet = TRUE)
-   cat(pkgName, "is deployed successfully.")
+   cat("Installing package", pkgName, "\n")
+   devtools::install(quiet = TRUE)
+   cat(pkgName, "is deployed successfully.\n")
+   cat("Reloading package", pkgName, "\n")
+   devtools::load_all()
 }
 
 TidyUpList <- function(lst) {
