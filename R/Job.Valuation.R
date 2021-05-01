@@ -2,7 +2,6 @@ setClass(
    Class = "Job.Valuation",
    contains = "IJob",
    slots = c(
-      # MaxProjYears = "integer",
       DbAppend = "logical",
       DbSaveCf = "logical"
    )
@@ -15,7 +14,6 @@ Job.Valuation <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, dbSaveCf = TR
       Dispatcher = dispatcher,
       DbDriver = dbDrvr,
       DbConnArgs = dbConnArgs,
-      # MaxProjYears = as.integer(maxProjYears),
       DbAppend = dbAppend,
       DbSaveCf = dbSaveCf,
       Descrip = as.character(descrip)
@@ -28,13 +26,6 @@ setValidity(
    Class = "Job.Valuation",
    method = function(object) {
       err <- New.SysMessage()
-      # isValid <- Validate(
-      #    ValidatorGroup(
-      #       Validator.Length(minLen = 1, maxLen = 1),
-      #       Validator.Range(minValue = 0, maxValue = 100)
-      #    ),
-      #    object@MaxProjYears
-      # )
       if (NoMessage(err)) {
          return(TRUE)
       } else {
@@ -43,24 +34,6 @@ setValidity(
    }
 )
 
-# setMethod(
-#    f = "GetMaxProjYears",
-#    signature = "Job.Valuation",
-#    definition = function(object) {
-#       return(object@MaxProjYears)
-#    }
-# )
-
-# setMethod(
-#    f = "SetMaxProjYears<-",
-#    signature = "Job.Valuation",
-#    definition = function(object, value) {
-#       object@MaxProjYears <- as.integer(value)
-#       validObject(object)
-#       return(object)
-#    }
-# )
-
 setMethod(
    f = "Initialize",
    signature = "Job.Valuation",
@@ -68,9 +41,7 @@ setMethod(
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
          if (object@DbAppend == FALSE) {
-            whereClause <- paste0("JobId = '", GetId(object), "'")
-            DeleteRows(conn, "ValuSumm", whereClause)
-            DeleteRows(conn, "Cf", whereClause)
+            ClearJobOutput(GetId(object), conn, c("ValuSumm", "Cf"))
          }
          DisconnectDb(conn)
       }
@@ -94,10 +65,7 @@ setMethod(
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
          WriteTable.ValuSumm(conn, valuSumm)
-         # cfProjYears <- GetMaxProjYears(object)
          if (!is.null(cf) & object@DbSaveCf) {
-         # if (!is.null(cf)) {
-            # cf <- cf[1:(cfProjYears * 12),]
             WriteTable.Cf(conn, cf)
          }
          CompactDb(conn)
