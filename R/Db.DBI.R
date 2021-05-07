@@ -289,7 +289,7 @@ setMethod(
    f = "CompactDb",
    signature = "DBIConnection",
    definition = function(conn) {
-      DBI::dbExecute(conn, "VACUUM")
+      stop("'CompactDb' method must be implemented by a child class of DBIConnection.")
    }
 )
 

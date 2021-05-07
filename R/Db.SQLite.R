@@ -12,3 +12,12 @@ setMethod(
       return(df)
    }
 )
+
+setMethod(
+   f = "CompactDb",
+   signature = "SQLiteConnection",
+   definition = function(conn) {
+      DBI::dbExecute(conn, "VACUUM")
+   }
+)
+

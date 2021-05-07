@@ -91,3 +91,12 @@ setMethod(
    }
 )
 
+setMethod(
+   f = "CompactDb",
+   signature = "PqConnection",
+   definition = function(conn) {
+      DBI::dbExecute(conn, "VACUUM FULL")
+   }
+)
+
+
