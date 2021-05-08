@@ -17,7 +17,8 @@ Imports:
     openxlsx,
     readxl,
     RSQLite,
-    usethis
+    usethis,
+    RPostgres
 Collate: 
     'AllGeneric.R'
     'AllGlobal.R'
