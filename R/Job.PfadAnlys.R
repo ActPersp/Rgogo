@@ -22,7 +22,8 @@ setMethod(
    definition = function(object) {
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
-         DeleteRows(conn, "Pfad", paste0("JobId = '", GetId(object), "'"))
+         # DeleteRows(conn, "Pfad", paste0("JobId = '", GetId(object), "'"))
+         ClearJobOutput(GetId(object), conn, c("Pfad"))
          DisconnectDb(conn)
       }
       return(object)

@@ -2,6 +2,7 @@
 setClassUnion(name = "character_or_numeric", members = c("character", "numeric"))
 setClassUnion(name = "integer_or_list", members = c("integer", "list"))
 setClassUnion(name = "numeric_or_list", members = c("numeric", "list"))
+setClassUnion(name = "logical_or_numeric", members = c("logical", "numeric"))
 
 # Definition of generic functions
 setGeneric(name = "GetId", def = function(object) {standardGeneric("GetId")})
@@ -349,6 +350,7 @@ setGeneric(name = "WriteTable.Pfad", def = function(conn, data, ...) {standardGe
 setGeneric(name = "DeleteRows", def = function(conn, tableName, where) {standardGeneric("DeleteRows")})
 # setGeneric(name = "GetMaxProjYears", def = function(object) {standardGeneric("GetMaxProjYears")})
 # setGeneric(name = "SetMaxProjYears<-", def = function(object, value) {standardGeneric("SetMaxProjYears<-")})
+setGeneric(name = "CreateDb", def = function(object, args) {standardGeneric("CreateDb")})
 setGeneric(name = "CompactDb", def = function(conn) {standardGeneric("CompactDb")})
 setGeneric(name = "ConnectDb", def = function(object, ...) {standardGeneric("ConnectDb")})
 setGeneric(name = "DisconnectDb", def = function(object) {standardGeneric("DisconnectDb")})
@@ -433,3 +435,6 @@ setGeneric(name = "GetCfExportYears", def = function(object) {standardGeneric("G
 setGeneric(name = "SetCfExportYears<-", def = function(object, value) {standardGeneric("SetCfExportYears<-")})
 setGeneric(name = "GetCorridor", def = function(object) {standardGeneric("GetCorridor")})
 setGeneric(name = "SetCorridor<-", def = function(object, value) {standardGeneric("SetCorridor<-")})
+
+setGeneric(name = "ClearJobOutput", def = function(jobId, conn, tableNames) {standardGeneric("ClearJobOutput")})
+

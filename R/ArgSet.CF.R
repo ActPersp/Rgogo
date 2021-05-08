@@ -1,9 +1,3 @@
-#' @include IArgSet.R
-#' @include IMortAssump.R
-#' @include ILapseAssump.R
-#' @include IExpnsAssump.R
-NULL
-
 setClass(
    Class = "ArgSet.CF",
    contains = "IArgSet",
@@ -27,12 +21,12 @@ setValidity(
       if (isValid != TRUE) {
          AddMessage(err) <- "Slot '@ProjStartDate' must contain a value of length 1."
       }
-      # @ProjStartDate: must be the first day of a calendar month
-      if (!is.na(object@ProjStartDate)) {
-         if (lubridate::day(object@ProjStartDate) != 1) {
-            AddMessage(err) <- "Cashflow projection starting date must be the first day of a calendar month."
-         }
-      }
+      # # @ProjStartDate: must be the first day of a calendar month
+      # if (!is.na(object@ProjStartDate)) {
+      #    if (lubridate::day(object@ProjStartDate) != 1) {
+      #       AddMessage(err) <- "Cashflow projection starting date must be the first day of a calendar month."
+      #    }
+      # }
       # @MortAssump: length of value must not be greater than 1.
       isValid = Validate(Validator.Length(minLen = 0, maxLen = 1), object@MortAssump)
       if (isValid != TRUE) {

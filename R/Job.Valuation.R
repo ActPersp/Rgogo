@@ -2,22 +2,20 @@ setClass(
    Class = "Job.Valuation",
    contains = "IJob",
    slots = c(
-      # MaxProjYears = "integer",
       DbAppend = "logical",
-      DbSaveCf = "logical"
+      CfExportYears = "numeric"
    )
 )
 
-Job.Valuation <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, dbSaveCf = TRUE, dbAppend = FALSE, id, descrip = character(0L), ...) {
+Job.Valuation <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, cfExportYears = NA_integer_, dbAppend = FALSE, id, descrip = character(0L), ...) {
    job <- new(
       Class = "Job.Valuation",
       InpVars = inpVars,
       Dispatcher = dispatcher,
       DbDriver = dbDrvr,
       DbConnArgs = dbConnArgs,
-      # MaxProjYears = as.integer(maxProjYears),
       DbAppend = dbAppend,
-      DbSaveCf = dbSaveCf,
+      CfExportYears = cfExportYears,
       Descrip = as.character(descrip)
    )
    SetJobId(job) <- as.character(id)
@@ -28,13 +26,16 @@ setValidity(
    Class = "Job.Valuation",
    method = function(object) {
       err <- New.SysMessage()
-      # isValid <- Validate(
-      #    ValidatorGroup(
-      #       Validator.Length(minLen = 1, maxLen = 1),
-      #       Validator.Range(minValue = 0, maxValue = 100)
-      #    ),
-      #    object@MaxProjYears
-      # )
+      isValid <- Validate(
+         ValidatorGroup(
+            Validator.Length(minLen = 1, maxLen = 1),
+            Validator.Range(minValue = 0, maxValue = 100, allowNA = TRUE)
+         ),
+         object@CfExportYears
+      )
+      if(isValid != TRUE) {
+         AddMessage(err) <- "Invalid cash flow export years.  It must be an integer scalar between 0 and 100."
+      }
       if (NoMessage(err)) {
          return(TRUE)
       } else {
@@ -43,23 +44,23 @@ setValidity(
    }
 )
 
-# setMethod(
-#    f = "GetMaxProjYears",
-#    signature = "Job.Valuation",
-#    definition = function(object) {
-#       return(object@MaxProjYears)
-#    }
-# )
+setMethod(
+   f = "GetCfExportYears",
+   signature = "Job.Valuation",
+   definition = function(object) {
+      return(object@CfExportYears)
+   }
+)
 
-# setMethod(
-#    f = "SetMaxProjYears<-",
-#    signature = "Job.Valuation",
-#    definition = function(object, value) {
-#       object@MaxProjYears <- as.integer(value)
-#       validObject(object)
-#       return(object)
-#    }
-# )
+setMethod(
+   f = "SetCfExportYears<-",
+   signature = "Job.Valuation",
+   definition = function(object, value) {
+      object@CfExportYears <- as.integer(value)
+      validObject(object)
+      return(object)
+   }
+)
 
 setMethod(
    f = "Initialize",
@@ -68,9 +69,7 @@ setMethod(
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
          if (object@DbAppend == FALSE) {
-            whereClause <- paste0("JobId = '", GetId(object), "'")
-            DeleteRows(conn, "ValuSumm", whereClause)
-            DeleteRows(conn, "Cf", whereClause)
+            ClearJobOutput(GetId(object), conn, c("ValuSumm", "Cf"))
          }
          DisconnectDb(conn)
       }
@@ -84,20 +83,31 @@ setMethod(
    definition = function(object, result) {
       jobId <- GetJobId(object)
       valuSumm <- cbind(JobId = jobId, To.data.frame(result, "ValuSumm"))
-      cf <- To.data.frame(result, "Cf")
-      if (dim(cf)[1] > 0) {
-         cf <- cbind(JobId = jobId, cf)
-      } else {
-         cf <- NULL
+      cfLen <- round(GetCfExportYears(object) * 12, digits = 0)
+      if (!is.na(cfLen)) {
+         result <- lapply(
+            result,
+            function(rslt) {
+               if (!is.null(rslt$Cf)) {
+                  rslt$Cf <- lapply(
+                     rslt$Cf,
+                     function(cf) {
+                        length(cf) <- min(cfLen, length(cf))
+                        return(cf)
+                     }
+                  )
+               }
+               return(rslt)
+            }
+         )
       }
       # Output job results
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
          WriteTable.ValuSumm(conn, valuSumm)
-         # cfProjYears <- GetMaxProjYears(object)
-         if (!is.null(cf) & object@DbSaveCf) {
-         # if (!is.null(cf)) {
-            # cf <- cf[1:(cfProjYears * 12),]
+         cf <- To.data.frame(result, "Cf")
+         if (dim(cf)[1] > 0) {
+            cf <- cbind(JobId = jobId, cf)
             WriteTable.Cf(conn, cf)
          }
          CompactDb(conn)
