@@ -65,7 +65,7 @@ setGeneric(name = "Project", def = function(object, ...) {standardGeneric("Proje
 setGeneric(name = "GetCovYears", def = function(object, ...) {standardGeneric("GetCovYears")})
 setGeneric(name = "GetPremYears", def = function(object, ...) {standardGeneric("GetPremYears")})
 setGeneric(name = "SetCovPeriod", def = function(object, ...) {standardGeneric("SetCovPeriod")})
-setGeneric(name = "SetPremPeriod", def = function(object, ...) {standardGeneric("SetPremPeriod")})
+# setGeneric(name = "SetPremPeriod", def = function(object, ...) {standardGeneric("SetPremPeriod")})
 setGeneric(name = "SetCommSchd<-", def = function(object, value) {standardGeneric("SetCommSchd<-")})
 setGeneric(name = "SetOvrdOnCommSchd<-", def = function(object, value) {standardGeneric("SetOvrdOnCommSchd<-")})
 setGeneric(name = "SetOvrdOnPremSchd<-", def = function(object, value) {standardGeneric("SetOvrdOnPremSchd<-")})
@@ -437,4 +437,7 @@ setGeneric(name = "GetCorridor", def = function(object) {standardGeneric("GetCor
 setGeneric(name = "SetCorridor<-", def = function(object, value) {standardGeneric("SetCorridor<-")})
 
 setGeneric(name = "ClearJobOutput", def = function(jobId, conn, tableNames) {standardGeneric("ClearJobOutput")})
+
+setGeneric(name = "NoLapseAfterPaidUp", def = function(object) {standardGeneric("NoLapseAfterPaidUp")})
+setGeneric(name = "NoLapseAfterPaidUp<-", def = function(object, value) {standardGeneric("NoLapseAfterPaidUp<-")})
 

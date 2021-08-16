@@ -1,29 +1,6 @@
-setClass(Class = "Model.CF", contains = "IModel")
-
-Model.CF <- function(args = ArgSet.CF(), descrip = character(0L), id = character(0L)) {
-   model <- new(Class = "Model.CF", Args = args, Descrip = as.character(descrip))
-   SetModelId(model) <- as.character(id)
-   return(model)
-}
-
-setMethod(
-   f = "Run",
-   signature = c("Model.CF", "Cov"),
-   definition = function(object, var, result) {
-      projStartDate <- GetArgValue(object, "ProjStartDate")
-      if (projStartDate <= GetExpiryDate(var)) {
-         result$CovData <- var
-         result$.ArgSet <- GetArgs(object)
-         return(Run.CF(object, GetPlan(var), var, result))
-      } else {
-         stop("The coverage has expired before projection starting date.")
-      }
-   }
-)
-
 setMethod(
    f = "Run.CF",
-   signature = c("Model.CF", "IPlan", "Cov"),
+   signature = c("Model.CF", "IPlan.LT.JL", "Cov"),
    definition = function(object, plan, cov, result) {
       covMonths <- GetCovMonths(plan, cov)
       projStartDate <- GetArgValue(object, "ProjStartDate")
@@ -41,13 +18,16 @@ setMethod(
       if (!is.null(mortAssump)) {
          result <- GetAssump(mortAssump, cov, plan, result)
          if (GetArgValue(object, "ApplyMortMargin")) {
-            qRate <- result$q.Padd
+            qRate_x <- result$q_x.Padd
+            qRate_y <- result$q_y.Padd
          } else {
-            qRate <- result$q.Expd
+            qRate_x <- result$q_x.Expd
+            qRate_y <- result$q_y.Expd
          }
-         q <- Convert_qx(qRate, 12L, "ud")[1:covMonths]
+         q_x <- Convert_qx(qRate_x, 12L, "ud")[1:covMonths]
+         q_y <- Convert_qx(qRate_y, 12L, "ud")[1:covMonths]
       } else {
-         q <- rep(0, length.out = covMonths)
+         q_y <- q_x <- rep(0, length.out = covMonths)
       }
 
       # Get lapse assumption information
@@ -112,6 +92,8 @@ setMethod(
       }
 
       # Probability of survival and cashflow projection
+      prob <- GetLifeProb.2L(q_x, q_y)
+      q <- prob$jl.q_xy
       p <- 1 - q - w
       pn <- ShiftRight(cumprod(p), positions = 1, filler = 1)
       pn <- pn / pn[projPolMonths[1]]
@@ -259,35 +241,13 @@ setMethod(
       } else {
          cfReinCommRfnd <- rep(0, length.out = projLen)
       }
-      # # Annuity benefit cashflow
-      # if (!is.null(proj$Ben.Anu)) {
-      #    crtnMonths <- GetAnuCrtnMonths(plan)
-      #    if (GetAnuTiming(plan) == 0L) {
-      #       cfAnuBen <- -proj$Ben.Anu[projPolMonths] * pn[projPolMonths]    # Annuity benefit payable at the beginning of period
-      #    } else {
-      #       cfAnuBen <- -proj$Ben.Anu[projPolMonths] * pn[projPolMonths] * p[projPolMonths]    # Annuity benefit payable at the end of period
-      #    }
-      #    if (crtnMonths >= projPolMonths[1]) {
-      #       cfAnuBen[1:(crtnMonths - projPolMonths[1] + 1)] <- -proj$Ben.Anu[projPolMonths[1]:crtnMonths]
-      #    }
-      #    if (projLen > covProjLen) {
-      #       cfAnuBen <- c(zeroCf, cfAnuBen)
-      #    } else if (!IsBegPolMonth) {
-      #       cfAnuBen <- ShiftLeft(cfAnuBen, positions = 1, filler = 0)
-      #    }
-      # } else {
-      #    cfAnuBen <- rep(0, length.out = projLen)
-      # }
 
       # Projected expenses and projected expense cashflows
-
       if (!is.null(result$.ProjEndPolMonth)) {
          v <- (seq_along(ae) +covMonths - covProjLen) <= result$.ProjEndPolMonth
          ae <- ae * v
          me <- me * v
       }
-
-
       result$Proj$Expns.Acq = c(rep(NA, covMonths - covProjLen), ae[(projLen - covProjLen + 1):projLen])
       result$Proj$Expns.Mnt = c(rep(NA, covMonths - covProjLen), me[(projLen - covProjLen + 1):projLen])
       cfAcqExpns <- -ae * c(rep(0, length.out = projLen - covProjLen), pn[projPolMonths])
@@ -296,7 +256,6 @@ setMethod(
          cfAcqExpns <- ShiftLeft(cfAcqExpns, positions = 1, filler = 0)
          cfMntExpns <- ShiftLeft(cfMntExpns, positions = 1, filler = 0)
       }
-      # cfTotalGross <- cfPrem + cfPremTax + cfComm + cfOvrd + cfDthBen + cfMatBen + cfSurBen + cfDthBenPUA + cfMatBenPUA + cfSurBenPUA + cfAnuBen + cfAcqExpns + cfMntExpns
       cfTotalGross <- cfPrem + cfPremTax + cfComm + cfOvrd + cfDthBen + cfMatBen + cfSurBen + cfDthBenPUA + cfMatBenPUA + cfSurBenPUA + cfAcqExpns + cfMntExpns
       cfTotalRein <- cfReinBen + cfReinPrem + cfReinComm + cfReinPremRfnd + cfReinCommRfnd
 
@@ -338,99 +297,4 @@ setMethod(
       return(result)
    }
 )
-
-ExportToExcel.Cf <- function(result, annual, digits = integer(), wb = NULL, sheetName) {
-   df <- data.frame(result$Cf)
-   if (annual == TRUE) {
-      dfOutput <- data.frame(Timeline = GetYearStartValue(df[, "Timeline"]), stringsAsFactors = FALSE)
-   } else {
-      dfOutput <- data.frame(Timeline = df[, "Timeline"], stringsAsFactors = FALSE)
-   }
-   # dfOutput <- data.frame(Timeline = ifelse(annual == TRUE, GetYearStartValue(df[, "Timeline"]), df[, "Timeline"]), stringsAsFactors = FALSE)
-   if (annual == TRUE) {
-      dfOutput <- data.frame(Timeline = GetYearStartValue(df[, "Timeline"]), stringsAsFactors = FALSE)
-   } else {
-      dfOutput <- data.frame(Timeline = df[, "Timeline"], stringsAsFactors = FALSE)
-   }
-   cnames <- names(df)
-   for (cname in cnames[!cnames %in% c("Timeline", "CovId")]) {
-      v <- df[, cname]
-      if (any(v != 0)) {
-         if (annual == TRUE) {
-            v <- GetYearlyTotal(v)
-         }
-         dfOutput <- eval(expr = parse(text = paste0("cbind(dfOutput, data.frame(", cname, " = v, stringsAsFactors = FALSE))")))
-      }
-   }
-   if (length(digits) > 0) {
-      dfOutput <- Round.data.frame(dfOutput, digits)
-   }
-   if (is.null(wb)) {
-      wb <- openxlsx::createWorkbook()     # If wb is null, create an new workbook object
-   }
-   openxlsx::addWorksheet(wb, sheetName)
-   openxlsx::writeDataTable(wb, sheet = sheetName, x = dfOutput, startCol = 1, startRow = 1)
-   openxlsx::setColWidths(wb, sheet = sheetName, cols = (1:dim(dfOutput)[2]), widths = 12)
-   return(wb)
-}
-
-ExportToExcel.Proj <- function(result, annual, digits = integer(), wb = NULL, sheetName) {
-   df <- data.frame(result$Proj)
-   if (annual == TRUE) {
-      dfOutput <- data.frame(Timeline = GetYearStartValue(df[, "Timeline"]), stringsAsFactors = FALSE)
-   } else {
-      dfOutput <- data.frame(Timeline = df[, "Timeline"], stringsAsFactors = FALSE)
-   }
-   cnames <- names(df)
-   for (cname in cnames[cnames != "Timeline"]) {
-      v <- df[, cname]
-      if (any(v != 0, na.rm = TRUE)) {
-         if (annual == TRUE) {
-            v <- switch (cname,
-                         Prem = GetYearlyTotal(v),
-                         Prem.Tax = GetYearlyTotal(v),
-                         Comm = GetYearlyTotal(v),
-                         Comm.Ovrd = GetYearlyTotal(v),
-                         CV = GetYearStartValue(v),
-                         Naar = GetYearStartValue(v),
-                         Ben.Dth = GetYearStartValue(v),
-                         Ben.Sur = GetYearStartValue(v),
-                         Ben.Mat = GetYearStartValue(v),
-                         Ben.Anu = GetYearlyTotal(v),
-                         Rein.Retn = GetYearStartValue(v),
-                         Rein.Naar = GetYearStartValue(v),
-                         Rein.Prem = GetYearlyTotal(v),
-                         Rein.Prem.Rfnd = GetYearlyTotal(v),
-                         Rein.Comm = GetYearlyTotal(v),
-                         Rein.Comm.Rfnd = GetYearlyTotal(v),
-                         Rein.Ben = GetYearStartValue(v),
-                         PUA = GetYearStartValue(v),
-                         CV.PUA = GetYearStartValue(v),
-                         Ben.Dth.PUA = GetYearStartValue(v),
-                         Ben.Sur.PUA = GetYearStartValue(v),
-                         Ben.Mat.PUA = GetYearStartValue(v),
-                         AccBal = GetYearStartValue(v),
-                         CredIntr = GetYearlyTotal(v),
-                         AdminChrg = GetYearlyTotal(v),
-                         Expns.Acq = GetYearlyTotal(v),
-                         Expns.Mnt = GetYearlyTotal(v),
-                         # rep(NA, length.out = length(tLabel))
-                         NA
-            )
-         }
-         dfOutput <- eval(expr = parse(text = paste0("cbind(dfOutput, data.frame(", cname, " = v, stringsAsFactors = FALSE))")))
-      }
-   }
-   if (length(digits) > 0) {
-      dfOutput <- Round.data.frame(dfOutput, digits)
-   }
-   if (is.null(wb)) {
-      wb <- openxlsx::createWorkbook()     # If wb is null, create an new workbook object
-   }
-   openxlsx::addWorksheet(wb, sheetName)
-   openxlsx::writeDataTable(wb, sheet = sheetName, x = dfOutput, startCol = 1, startRow = 1)
-   openxlsx::setColWidths(wb, sheet = sheetName, cols = (1:dim(dfOutput)[2]), widths = 12)
-   return(wb)
-}
-
 
