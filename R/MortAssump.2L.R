@@ -73,6 +73,7 @@ setMethod(
       # Get expected mortality assumption info of the second life.
       SetIssAge(cov) <- GetIssAge2(cov)
       SetRiskClass(cov) <- GetRiskClass2(cov)
+      SetMortMultExtra(cov) <- GetMortMultExtra2(cov)
       if (HasValue(GetFaceAmt2(cov))) {
          SetFaceAmt(cov) <- GetFaceAmt2(cov)
       }
@@ -95,6 +96,7 @@ setMethod(
       # Get padded mortality assumption info of the second life.
       SetIssAge(cov) <- GetIssAge2(cov)
       SetRiskClass(cov) <- GetRiskClass2(cov)
+      SetMortMultExtra(cov) <- GetMortMultExtra2(cov)
       if (HasValue(GetFaceAmt2(cov))) {
          SetFaceAmt(cov) <- GetFaceAmt2(cov)
       }

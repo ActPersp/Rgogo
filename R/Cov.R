@@ -26,6 +26,8 @@ setClass(
              CommSchd2 = "character",
              OvrdOnPremSchd2 = "character",
              OvrdOnCommSchd2 = "character",
+             MortMultExtra = "numeric",
+             MortMultExtra2 = "numeric",
              Descrip = "character"
    )
 )
@@ -231,6 +233,16 @@ setValidity(
          return(TRUE)
       } else {
          return(GetMessage(err))
+      }
+      # Validate @MortMultExtra
+      isValid <- Validate(Validator.Length(minLen = 0, maxLen = 1), object@MortMultExtra)
+      if (isValid != TRUE) {
+         AddMessage(err) <- "Slot @MortMultExtra must be a numeric scalar."
+      }
+      # Validate @MortMultExtra2
+      isValid <- Validate(Validator.Length(minLen = 0, maxLen = 1), object@MortMultExtra2)
+      if (isValid != TRUE) {
+         AddMessage(err) <- "Slot @MortMultExtra2 must be a numeric scalar."
       }
    }
 )
@@ -920,3 +932,46 @@ setMethod(
    }
 )
 
+setMethod(
+   f = "GetMortMultExtra",
+   signature = "Cov",
+   definition = function(object) {
+      if (HasValue(object@MortMultExtra)) {
+         return(object@MortMultExtra)
+      } else {
+         return(0)
+      }
+   }
+)
+
+setMethod(
+   f = "SetMortMultExtra<-",
+   signature = "Cov",
+   definition = function(object, value) {
+      object@MortMultExtra <- as.numeric(value)
+      validObject(object)
+      return(object)
+   }
+)
+
+setMethod(
+   f = "GetMortMultExtra2",
+   signature = "Cov",
+   definition = function(object) {
+      if (HasValue(object@MortMultExtra2)) {
+         return(object@MortMultExtra2)
+      } else {
+         return(0)
+      }
+   }
+)
+
+setMethod(
+   f = "SetMortMultExtra2<-",
+   signature = "Cov",
+   definition = function(object, value) {
+      object@MortMultExtra2 <- as.numeric(value)
+      validObject(object)
+      return(object)
+   }
+)

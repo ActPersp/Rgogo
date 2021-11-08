@@ -8,7 +8,8 @@ setClass(
       LapseRate = "character_or_numeric",
       LapseRateMult = "numeric",
       LapseRateFlatExtra = "numeric",
-      Margin = "numeric"
+      Margin = "numeric",
+      NoLapseAfterPaidUp = "logical"
    )
 )
 
@@ -50,6 +51,10 @@ setValidity(
       if (Validate(v, object@Margin) != TRUE) {
          AddMessage(err) <- "Value of slot @Margin in class LapseAssump is invalid."
       }
+      # Validate @NoLapseAfterPaidUp
+      if (length(object@NoLapseAfterPaidUp) != 1) {
+         AddMessage(err) <- "Slot @NoLapseAfterPaidUp must contain a logical value of length 1."
+      }
       if (NoMessage(err)) {
          return(TRUE)
       } else {
@@ -59,13 +64,14 @@ setValidity(
 )
 
 LapseAssump <- function(lapseRate = numeric(0), lapseRateMult = 1, lapseRateFlatExtra = 0,
-                        margin = 0, id = character(0), descrip = character(0)) {
+                        margin = 0, noLapseAfterPaidUp = TRUE, id = character(0), descrip = character(0)) {
    assump <- new(
       Class = "LapseAssump",
       LapseRate = lapseRate,
       LapseRateMult = lapseRateMult,
       LapseRateFlatExtra = lapseRateFlatExtra,
       Margin = margin,
+      NoLapseAfterPaidUp = noLapseAfterPaidUp,
       Descrip = as.character(descrip)
    )
    SetAssumpId(assump) <- as.character(id)
@@ -185,6 +191,23 @@ setMethod(
    definition = function(object, value) {
       object@Margin <- value
       validObject(object)
+      return(object)
+   }
+)
+
+setMethod(
+   f = "NoLapseAfterPaidUp",
+   signature = "LapseAssump",
+   definition = function(object) {
+      return(object@NoLapseAfterPaidUp)
+   }
+)
+
+setMethod(
+   f = "NoLapseAfterPaidUp<-",
+   signature = "LapseAssump",
+   definition = function(object, value) {
+      object@NoLapseAfterPaidUp <- value
       return(object)
    }
 )

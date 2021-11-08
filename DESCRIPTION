@@ -1,7 +1,7 @@
 Package: Rgogo
 Type: Package
 Title: Rgogo: An Object-Oriented Actuarial Modeling Framework
-Version: 21.05.01
+Version: 21.11.08
 Authors@R: person("Edward", "Kuo", email = "ekuo@actuarialperspective.com", role = c("aut", "cre"))
 Description: Rgogo provides building blocks that allow actuaries to build models with ease and flexibility.
 License: GNU GPLv3
@@ -58,11 +58,13 @@ Collate:
     'Job.CfProj.R'
     'Job.PfadAnlys.R'
     'IPlan.LT.R'
+    'IPlan.LT.JL.R'
     'IPlan.End.R'
     'IPlan.AEnd.R'
     'IPlan.LT.ROPM.R'
     'IPlan.NLT.R'
     'IPlan.DT.R'
+    'IPlan.DT.JL.R'
     'IPlan.UL.R'
     'IPlan.UL.A.R'
     'IPlan.WL.R'
@@ -85,6 +87,7 @@ Collate:
     'Job.ScnrTest.R'
     'LapseAssump.R'
     'Model.CF.R'
+    'Model.CF.JL.R'
     'Model.CF.IA.JS.R'
     'Model.CF.Anu.R'
     'Model.DCF.R'

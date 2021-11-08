@@ -41,18 +41,21 @@ setValidity(
    }
 )
 
-IPlan.DT <- function(covYears, premYears = NA,
+IPlan.DT <- function(covYears = NA, covToAge = NA, premYears = NA, premToAge = NA,
                      loanIntrRate, loanIntrRateType = 1L,
                      premTable = character(0L), modFactor = c("1" = 1, "2" = 0.5, "4" = 0.25, "12" = 1/12),
                      polFee = numeric(0), premTaxRate = numeric(0L),
                      commSchd = numeric(0L), ovrdOnPremSchd = numeric(0L), ovrdOnCommSchd = numeric(0L),
                      rein = character(0L), id = character(0L), descrip = character(0L)) {
-   covPeriod <- c(CovYears = covYears)
-   if (is.na(premYears)) {
-      premPeriod <- c(PremYears = covYears)
+   stopifnot(any(!is.na(c(covYears, covToAge))))
+   covPeriod <- c(CovYears = covYears, CovToAge = as.integer(covToAge))
+   covPeriod <- covPeriod[!is.na(covPeriod)]
+   if (is.na(premYears) & is.na(premToAge)) {
+      premPeriod <- c(PremYears = covYears, PremToAge = as.integer(covToAge))
    } else {
-      premPeriod <- c(PremYears = premYears)
+      premPeriod <- c(PremYears = premYears, PremToAge = as.integer(premToAge))
    }
+   premPeriod <- premPeriod[!is.na(premPeriod)]
    plan <- new(Class = "IPlan.DT",
                CovPeriod = covPeriod,
                PremPeriod = premPeriod,

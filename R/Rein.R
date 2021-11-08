@@ -133,8 +133,13 @@ setMethod(
 setMethod(
    f = "GetPremMode",
    signature = "Rein",
-   definition = function(object) {
-      return(object@PremMode)
+   definition = function(object, cov = NULL) {
+      if (is.null(cov) | HasValue(object@PremMode) ) {
+         return(object@PremMode)
+      } else {
+         # If @PremMode is not specified, use coverage premium mode.
+         return(GetPremMode(cov))
+      }
    }
 )
 
@@ -312,10 +317,15 @@ setMethod(
    f = "ProjReinNaar",
    signature = "Rein",
    definition = function(object, cov, resultContainer) {
+      # Determine retention limit
+      retnLimit <- GetRetnLimit(object, cov)
+      if (!is.null(resultContainer$.RetnLimitAdj)) {
+         retnLimit <- max(retnLimit + resultContainer$.RetnLimitAdj, 0)
+      }
       # Determine reinsured proportion
       if (!HasValue(reinProp <- GetReinProp(cov))) {
          faceAmt <- GetFaceAmt(cov)
-         cedAmt <- faceAmt - min(faceAmt * GetRetnProp(object, cov), GetRetnLimit(object, cov))
+         cedAmt <- faceAmt - min(faceAmt * GetRetnProp(object, cov), retnLimit)
          reinProp <- cedAmt * (cedAmt >= GetMinReinAmt(object, cov)) / faceAmt
       }
       # Project retention and reinsured Naar
@@ -344,7 +354,7 @@ setMethod(
          }
          # Project reinsurance premium
          reinPremTableMult <- GetPremTableMult(object, cov)
-         reinPremMode <- GetPremMode(object)
+         reinPremMode <- GetPremMode(object, cov)
          vReinPremRate <- rep((tableRate * reinPremTableMult), each = 12, length.out = covMonths)
          vReinPremPayable <- rep(ifelse((1:12-1) %% (12/reinPremMode) == 0, 1, 0) / reinPremMode, length.out = covMonths)
          projReinPrem <- vReinPremRate * vReinPremPayable * reinNaar
@@ -352,7 +362,6 @@ setMethod(
             # Assume lapse occurs at the date when coverage premium is payable.
             interval <- 12 / reinPremMode
             pctRfnd <- rep(seq(from = interval - 1, to = 0) / interval, length.out = covMonths)
-            # lapseTiming <- ((1:covMonths) %% (12/GetPremMode(cov)) == 0) & ((1:covMonths) <= GetPremMonths(cov))
             lapseTiming <- ((1:covMonths) %% (12/GetPremMode(cov)) == 0)
             projReinPremRfnd <- projReinPrem[((1:covMonths)-1) %/% interval * interval + 1] * pctRfnd * lapseTiming
             resultContainer$.pctRfnd <- pctRfnd * lapseTiming
@@ -377,7 +386,7 @@ setMethod(
          projReinComm <- projReinPrem * reinCommSchd
          # Refund unearned reinsurance commission if applicable
          if (GetRfndUrndCommOnLapse(object)) {
-            interval <- 12 / GetPremMode(object)
+            interval <- 12 / GetPremMode(object, cov)
             projReinCommRfnd <- projReinComm[((1:covMonths)-1) %/% interval * interval + 1] * resultContainer$.pctRfnd
          } else {
             projReinCommRfnd <- rep(0, length.out = covMonths)
