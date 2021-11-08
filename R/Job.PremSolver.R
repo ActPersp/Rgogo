@@ -31,6 +31,7 @@ setMethod(
       if (object@ExportExcel != FALSE) {
          ExportToExcel(object, jobResult)
       }
+      devtools::load_all()
       return(jobResult)
    }
 )

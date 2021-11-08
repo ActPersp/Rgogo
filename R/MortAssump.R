@@ -278,7 +278,7 @@ setMethod(
          qTableRate <- rep(0, length.out = ifelse(ignoreCovPeriod, GetValue(Rgogo::Const.MaxProjYears), covYears))
       }
       qMult <- GetMortTableMult(object, cov, plan)
-      return(qTableRate * qMult)
+      return(qTableRate * qMult * (1 + GetMortMultExtra(cov)))
    }
 )
 
@@ -336,7 +336,7 @@ setMethod(
       # Check if the base mortality table is a select and ultimate table.  If yes, get the ultimate mortality rate to calculate PfAD
       qTable <- GetMortTable(object, cov, plan)
       if (class(qTable) == "Table.SU") {
-         qUlt <- .GetUltMortRateVector(qTable, cov, GetPolYear(GetIssDate(cov), projStartDate)) * GetMortTableMult(object, cov, plan)
+         qUlt <- .GetUltMortRateVector(qTable, cov, GetPolYear(GetIssDate(cov), projStartDate)) * GetMortTableMult(object, cov, plan) * (1 + GetMortMultExtra(cov))
       } else {
          qUlt <- assumpInfo$.q
       }
