@@ -27,11 +27,12 @@ setMethod(
          for (tbl in jobResult) {
             SaveAsRda(tbl, overwrite = TRUE)
          }
+         devtools::install(quiet = TRUE)
+         devtools::load_all()
       }
       if (object@ExportExcel != FALSE) {
          ExportToExcel(object, jobResult)
       }
-      devtools::load_all()
       return(jobResult)
    }
 )
