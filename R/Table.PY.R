@@ -1,6 +1,3 @@
-#' @include ITable.R
-NULL
-
 setClass(
    Class = "Table.PY",
    contains = "ITable",
