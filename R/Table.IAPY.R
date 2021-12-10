@@ -52,7 +52,7 @@ setValidity(
    }
 )
 
-Table.IAPY <- function(minAge, maxAge, maxPolYear, tBase, tValue = NA, fillByAge = TRUE,
+Table.IAPY <- function(minAge, maxAge, maxPolYear, tBase, tValue = NA,
                        source = character(0L), createdBy = character(0L),
                        id = character(0L), descrip = character(0L)) {
    tbl <- new(Class = "Table.IAPY")
@@ -60,7 +60,7 @@ Table.IAPY <- function(minAge, maxAge, maxPolYear, tBase, tValue = NA, fillByAge
                         nrow = maxAge - minAge + 1,
                         ncol = maxPolYear,
                         dimnames = list(as.character(minAge:maxAge), as.character(1:maxPolYear)),
-                        byrow = fillByAge
+                        byrow = TRUE
    )
    tbl@MinAge <- as.integer(minAge)
    tbl@MaxAge <- as.integer(maxAge)

@@ -64,7 +64,7 @@ setValidity(
    }
 )
 
-Table.AABY <- function(minAge, maxAge, minBirthYear, maxBirthYear, tBase, tValue = NA, fillByAge = TRUE,
+Table.AABY <- function(minAge, maxAge, minBirthYear, maxBirthYear, tBase, tValue = NA,
                        source = character(0L), createdBy = character(0L),
                        id = character(0L), descrip = character(0L)) {
    stopifnot(minBirthYear >= 1900, minBirthYear <= 9999, maxBirthYear >= 1900, maxBirthYear <= 9999, minBirthYear <= maxBirthYear)
@@ -73,7 +73,7 @@ Table.AABY <- function(minAge, maxAge, minBirthYear, maxBirthYear, tBase, tValue
                         nrow = maxAge - minAge + 1,
                         ncol = maxBirthYear - minBirthYear + 1,
                         dimnames = list(as.character(minAge:maxAge), as.character(minBirthYear:maxBirthYear)),
-                        byrow = fillByAge
+                        byrow = TRUE
    )
    tbl@MinAge <- as.integer(minAge)
    tbl@MaxAge <- as.integer(maxAge)
