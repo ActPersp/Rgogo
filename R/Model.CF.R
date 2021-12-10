@@ -259,35 +259,13 @@ setMethod(
       } else {
          cfReinCommRfnd <- rep(0, length.out = projLen)
       }
-      # # Annuity benefit cashflow
-      # if (!is.null(proj$Ben.Anu)) {
-      #    crtnMonths <- GetAnuCrtnMonths(plan)
-      #    if (GetAnuTiming(plan) == 0L) {
-      #       cfAnuBen <- -proj$Ben.Anu[projPolMonths] * pn[projPolMonths]    # Annuity benefit payable at the beginning of period
-      #    } else {
-      #       cfAnuBen <- -proj$Ben.Anu[projPolMonths] * pn[projPolMonths] * p[projPolMonths]    # Annuity benefit payable at the end of period
-      #    }
-      #    if (crtnMonths >= projPolMonths[1]) {
-      #       cfAnuBen[1:(crtnMonths - projPolMonths[1] + 1)] <- -proj$Ben.Anu[projPolMonths[1]:crtnMonths]
-      #    }
-      #    if (projLen > covProjLen) {
-      #       cfAnuBen <- c(zeroCf, cfAnuBen)
-      #    } else if (!IsBegPolMonth) {
-      #       cfAnuBen <- ShiftLeft(cfAnuBen, positions = 1, filler = 0)
-      #    }
-      # } else {
-      #    cfAnuBen <- rep(0, length.out = projLen)
-      # }
 
       # Projected expenses and projected expense cashflows
-
       if (!is.null(result$.ProjEndPolMonth)) {
          v <- (seq_along(ae) +covMonths - covProjLen) <= result$.ProjEndPolMonth
          ae <- ae * v
          me <- me * v
       }
-
-
       result$Proj$Expns.Acq = c(rep(NA, covMonths - covProjLen), ae[(projLen - covProjLen + 1):projLen])
       result$Proj$Expns.Mnt = c(rep(NA, covMonths - covProjLen), me[(projLen - covProjLen + 1):projLen])
       cfAcqExpns <- -ae * c(rep(0, length.out = projLen - covProjLen), pn[projPolMonths])
@@ -296,7 +274,6 @@ setMethod(
          cfAcqExpns <- ShiftLeft(cfAcqExpns, positions = 1, filler = 0)
          cfMntExpns <- ShiftLeft(cfMntExpns, positions = 1, filler = 0)
       }
-      # cfTotalGross <- cfPrem + cfPremTax + cfComm + cfOvrd + cfDthBen + cfMatBen + cfSurBen + cfDthBenPUA + cfMatBenPUA + cfSurBenPUA + cfAnuBen + cfAcqExpns + cfMntExpns
       cfTotalGross <- cfPrem + cfPremTax + cfComm + cfOvrd + cfDthBen + cfMatBen + cfSurBen + cfDthBenPUA + cfMatBenPUA + cfSurBenPUA + cfAcqExpns + cfMntExpns
       cfTotalRein <- cfReinBen + cfReinPrem + cfReinComm + cfReinPremRfnd + cfReinCommRfnd
 
@@ -334,7 +311,6 @@ setMethod(
          pn = pn[projPolMonths],
          t = covProjTimeIndex[ceiling(covProjTimeIndex) >= 0]
       )
-
       return(result)
    }
 )
