@@ -63,7 +63,7 @@ setValidity(
       # Validate @IssAge
       isValid <- Validate(
          ValidatorGroup(
-            Validator.Length(minLen = 1, maxLen = 1),
+            Validator.Length(minLen = 0, maxLen = 1),
             Validator.Range(minValue = 0, maxValue = 120)
          ),
          object@IssAge
@@ -73,7 +73,7 @@ setValidity(
       }
       # Validate @RiskClass
       isValid <- Validate(
-         Validator.Length(minLen = 1, maxLen = 1),
+         Validator.Length(minLen = 0, maxLen = 1),
          object@RiskClass
       )
       if (isValid != TRUE) {
@@ -82,7 +82,7 @@ setValidity(
       # Validate @FaceAmt
       isValid <- Validate(
          ValidatorGroup(
-            Validator.Length(minLen = 1, maxLen = 1),
+            Validator.Length(minLen = 0, maxLen = 1),
             Validator.Range(minValue = 0)
          ),
          object@FaceAmt
@@ -247,11 +247,11 @@ setValidity(
    }
 )
 
-Cov <- function(issDate,
-                issAge,
-                riskClass,
-                faceAmt,
-                premMode,
+Cov <- function(issDate = as.Date("1900-01-01"),
+                issAge = integer(0L),
+                riskClass = character(0L),
+                faceAmt = numeric(0L),
+                premMode = integer(0L),
                 modPrem = NA_real_,
                 reinProp = NA_real_,
                 puaAmt = 0,
