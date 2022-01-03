@@ -27,7 +27,7 @@ Validator.OfClass <- function(clsName) {
 
 setMethod(
    f = "Validate",
-   signature = c("Validator.OfClass", "character"),
+   signature = c("Validator.OfClass", "ANY"),
    definition = function(object, value) {
       if (!is.list(value)) {
          value <- as.list(value)
