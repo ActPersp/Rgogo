@@ -502,11 +502,6 @@ setMethod(
    signature = "Cov",
    definition = function(object) {
       return(object@AccBal)
-      # if (HasValue(object@AccBal)) {
-      #    return(object@AccBal)
-      # } else {
-      #    return(0)
-      # }
    }
 )
 setMethod(
