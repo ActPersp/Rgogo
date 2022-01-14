@@ -75,11 +75,6 @@ setValidity(
       if (isValid != TRUE) {
          AddMessage(err) <- "Invaid expense charge type.  It must be 0 (dollar amount) or 1 (percent of fund balance)."
       }
-      # # Validate @SurChrgSchd
-      # isValid <- Validate(Validator.Range(minValue = 0, maxValue = 1), object@SurChrgSchd)
-      # if (isValid != TRUE) {
-      #    AddMessage(err) <- "Invalid surrender charge schedule.  The rates must be between 0 and 1."
-      # }
       # Validate @PremTaxRate
       isValid <- Validate(
          ValidatorGroup(
@@ -472,9 +467,6 @@ setMethod(
          prem <- rep(0, length.out = covMonths)
       }
       premTax <- prem * GetPremTaxRate(object, cov)
-      # if (!all(prem == 0)) {
-      #    resultContainer$Proj$Prem <- prem
-      # }
       resultContainer$Proj$Prem <- prem
       if (!all(premTax == 0)) {
          resultContainer$Proj$Prem.Tax <- premTax
