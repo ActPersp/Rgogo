@@ -1,6 +1,3 @@
-#' @include ITable.R
-NULL
-
 setClass(Class = "Table.AABY",
          contains = "ITable",
          slots = c(MinAge = "integer",
@@ -67,7 +64,7 @@ setValidity(
    }
 )
 
-Table.AABY <- function(minAge, maxAge, minBirthYear, maxBirthYear, tBase, tValue = NA, fillByAge = TRUE,
+Table.AABY <- function(minAge, maxAge, minBirthYear, maxBirthYear, tBase, tValue = NA,
                        source = character(0L), createdBy = character(0L),
                        id = character(0L), descrip = character(0L)) {
    stopifnot(minBirthYear >= 1900, minBirthYear <= 9999, maxBirthYear >= 1900, maxBirthYear <= 9999, minBirthYear <= maxBirthYear)
@@ -76,7 +73,7 @@ Table.AABY <- function(minAge, maxAge, minBirthYear, maxBirthYear, tBase, tValue
                         nrow = maxAge - minAge + 1,
                         ncol = maxBirthYear - minBirthYear + 1,
                         dimnames = list(as.character(minAge:maxAge), as.character(minBirthYear:maxBirthYear)),
-                        byrow = fillByAge
+                        byrow = TRUE
    )
    tbl@MinAge <- as.integer(minAge)
    tbl@MaxAge <- as.integer(maxAge)
@@ -145,20 +142,12 @@ setMethod(
    definition = function(tbl, lookUpKey, len = NA_integer_, valueIfNA = NA) {
       issAge <- GetIssAge(lookUpKey)
       birthYear <- as.character(as.numeric(format(GetIssDate(lookUpKey), "%Y")) - issAge)
-      # if (is.na(len)) {
-      #    attAge <- as.character(issAge:GetMaxAge(tbl))
-      # } else {
-      #    attAge <- as.character(issAge:(issAge + len - 1))
-      # }
       attAge <- as.character(issAge:GetMaxAge(tbl))
       v <- tbl@TValue[attAge, birthYear] / tbl@TBase
       if (!is.na(len)) {
          length(v) <- len
          v <- ifelse(is.na(v), valueIfNA, v)
       }
-      # stopifnot(all(attAge %in% dimnames(tbl@TValue)[[1]]))
-      # stopifnot(all(birthYear %in% dimnames(tbl@TValue)[[2]]))
-      # v <- tbl@TValue[attAge, birthYear] / tbl@TBase
       names(v) <- NULL
       return(v)
    }

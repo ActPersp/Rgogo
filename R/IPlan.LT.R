@@ -436,9 +436,7 @@ setMethod(
       }
       prem <- FillZeroIfNA(rep(c(modPrem, rep(0, times = (12 / premMode - 1))), length.out = GetPremMonths(object, cov)), len = GetCovMonths(object, cov))
       premTax <- prem * GetPremTaxRate(object, cov)
-      # if (!all(prem == 0)) {
-         resultContainer$Proj$Prem <- prem
-      # }
+      resultContainer$Proj$Prem <- prem
       if (!all(premTax == 0)) {
          resultContainer$Proj$Prem.Tax <- premTax
       }

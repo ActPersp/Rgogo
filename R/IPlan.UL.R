@@ -274,10 +274,14 @@ setMethod(
       isPayable <- ((((1:covMonths) - 1) %% (12 / GetPremMode(cov)) == 0) * ((1:covMonths) <= premMonths))
       projPrem <- modPrem * premAdj * isPayable
       projMinPrem <- modMinPrem * isPayable
+      premTax <- projPrem * GetPremTaxRate(object, cov)
       # Determine projected minimum premium and excess premium
       resultContainer$Proj$Prem <- projPrem
       resultContainer$Proj$Prem.Min <- pmin(projPrem, projMinPrem)
       resultContainer$Proj$Prem.Exs <- projPrem - resultContainer$Proj$Prem.Min
+      if (!all(premTax == 0)) {
+         resultContainer$Proj$Prem.Tax <- premTax
+      }
       return(resultContainer)
    }
 )
@@ -344,8 +348,6 @@ setMethod(
       resultContainer$.ProjEndPolMonth <- covMonths
       for (t in 1:covMonths) {
          fundBeg[t] <- ifelse(t == 1, 0, fundEnd[t - 1])
-         # fundBeg[t] <- fundBeg[t] + expnsChrg[t] * (expnsChrgTiming == 0) * ifelse(expnsChrgType == 0, 1, fundBeg[t])
-         # openBal <- fundBeg[t] + prem[t] + premLoad[t]
          naar[t] <- GetFaceAmt(cov)     # Net amount at risk of type B UL is equal to face amount.
          coi[t] <- -naar[t] * coiRate[t]
          openBal <- fundBeg[t] + prem[t] + premLoad[t] + expnsChrg[t] * (expnsChrgTiming == 0) + coi[t]

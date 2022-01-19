@@ -1,6 +1,3 @@
-#' @include ITable.R
-NULL
-
 setClass(Class = "Table.SU",
          contains = "ITable",
          slots = c(MinSelAge = "integer",
@@ -68,7 +65,7 @@ setValidity(
    }
 )
 
-Table.SU <- function(minSelAge, maxSelAge, selPeriod, maxAttAge, tBase, tValueSel = NA, fillByAge = TRUE, tValueUlt = NA,
+Table.SU <- function(minSelAge, maxSelAge, selPeriod, maxAttAge, tBase, tValueSel = NA, tValueUlt = NA,
                      source = character(0L), createdBy = character(0L),
                      id = character(0L), descrip = character(0L)) {
    tbl <- new(Class = "Table.SU")
@@ -76,7 +73,7 @@ Table.SU <- function(minSelAge, maxSelAge, selPeriod, maxAttAge, tBase, tValueSe
                         nrow = maxSelAge - minSelAge + 1,
                         ncol = selPeriod,
                         dimnames = list(as.character(minSelAge:maxSelAge), as.character(1:selPeriod)),
-                        byrow = fillByAge
+                        byrow = TRUE
    )
    tbl@TValueUlt <- matrix(data = tValueUlt,
                            nrow = maxAttAge - (minSelAge + selPeriod) + 1,

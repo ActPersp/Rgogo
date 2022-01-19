@@ -1,6 +1,3 @@
-#' @include ITable.R
-NULL
-
 setClass(Class = "Table.IA",
          contains = "ITable",
          slots = c(MinAge = "integer",
