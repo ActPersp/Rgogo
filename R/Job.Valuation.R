@@ -7,7 +7,7 @@ setClass(
    )
 )
 
-Job.Valuation <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, cfExportYears = NA_integer_, dbAppend = FALSE, id, descrip = character(0L), ...) {
+Job.Valuation <- function(inpVars, dispatcher, dbDrvr = NULL, dbConnArgs = character(0L), cfExportYears = NA_integer_, dbAppend = FALSE, id, descrip = character(0L), ...) {
    job <- new(
       Class = "Job.Valuation",
       InpVars = inpVars,
@@ -102,10 +102,10 @@ setMethod(
          )
       }
       # Output job results
+      cf <- To.data.frame(result, "Cf")
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
          WriteTable.ValuSumm(conn, valuSumm)
-         cf <- To.data.frame(result, "Cf")
          if (dim(cf)[1] > 0) {
             cf <- cbind(JobId = jobId, cf)
             WriteTable.Cf(conn, cf)
