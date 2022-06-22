@@ -1,6 +1,6 @@
 setClass(
    Class = "IPlan.DT",
-   contains = "IPlan.NLT",
+   contains = "IPlan.LT",
    slots = c(
       LoanIntrRate = "numeric",
       LoanIntrRateType = "integer"     #1L: stated rate; 2L: effective annual rate
@@ -61,8 +61,6 @@ IPlan.DT <- function(covYears = NA, covToAge = NA, premYears = NA, premToAge = N
                PremPeriod = premPeriod,
                LoanIntrRate = loanIntrRate,
                LoanIntrRateType = loanIntrRateType,
-               DthBenSchd = numeric(0L),
-               DthBenIntraYearMthd = integer(0L),
                PremTable = premTable,
                ModFactor = modFactor,
                PolFee = polFee,
@@ -114,42 +112,18 @@ setMethod(
 )
 
 setMethod(
-   f = "GetDthBenSchd",
+   f = "ProjDthBen",
    signature = "IPlan.DT",
-   definition = function(object, cov) {
-      covMonths <- GetCovMonths(object, cov)
+   definition = function(object, cov, resultContainer) {
       loanAmortInfo <- LoanAmort(
          loanAmt = 1,
          amortMonths = GetCovMonths(object, cov),
          intrRate = GetLoanIntrRate(object),
          intrRateType = GetLoanIntrRateType(object)
       )
-      return(loanAmortInfo$LoanBalance)
+      dthBen <- GetFaceAmt(cov) * loanAmortInfo$LoanBalance
+      resultContainer$Proj$Ben.Dth <- dthBen
+      return(resultContainer)
    }
 )
-
-setMethod(
-   f = "SetDthBenSchd<-",
-   signature = "IPlan.DT",
-   definition = function(object, value) {
-      stop("Method 'SetDthBenSchd<-' cannot be invoked by an object of class 'IPlan.DT'.")
-   }
-)
-
-setMethod(
-   f = "GetDthBenIntraYearMthd",
-   signature = "IPlan.DT",
-   definition = function(object) {
-      stop("Method 'GetDthBenIntraYearMthd' cannot be invoked by an object of class 'IPlan.DT'.")
-   }
-)
-
-setMethod(
-   f = "SetDthBenIntraYearMthd<-",
-   signature = "IPlan.DT",
-   definition = function(object, value) {
-      stop("Method 'SetDthBenIntraYearMthd<-' cannot be invoked by an object of class 'IPlan.DT'.")
-   }
-)
-
 
