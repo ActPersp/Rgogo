@@ -85,7 +85,7 @@ setMethod(
 
 setMethod(
    f = "SetLoanIntrRate<-",
-   signature = "IPlan.DT",
+   signature = c("IPlan.DT", "numeric"),
    definition = function(object, value) {
       object@LoanIntrRate <- value
       validObject(object)
@@ -103,7 +103,7 @@ setMethod(
 
 setMethod(
    f = "SetLoanIntrRateType<-",
-   signature = "IPlan.DT",
+   signature = c("IPlan.DT", "integer"),
    definition = function(object, value) {
       object@LoanIntrRateType = value
       validObject(object)
