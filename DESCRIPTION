@@ -1,7 +1,7 @@
 Package: Rgogo
 Type: Package
 Title: Rgogo: An Object-Oriented Actuarial Modeling Framework
-Version: 22.1.19
+Version: 22.7.1
 Authors@R: person("Edward", "Kuo", email = "ekuo@actuarialperspective.com", role = c("aut", "cre"))
 Description: Rgogo provides building blocks that allow actuaries to build models with ease and flexibility.
 License: GNU GPLv3
