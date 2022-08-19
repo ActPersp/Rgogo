@@ -20,6 +20,8 @@ setClass(
              ReportClass1 = "character",
              ReportClass2 = "character",
              ReportClass3 = "character",
+             ReportClass4 = "character",
+             ReportClass5 = "character",
              CommSchd = "character",
              OvrdOnPremSchd = "character",
              OvrdOnCommSchd = "character",
@@ -229,6 +231,22 @@ setValidity(
       if (isValid != TRUE) {
          AddMessage(err) <- "Slot @ReportClass3 must contain a string scalar."
       }
+      # Validate @ReportClass4
+      isValid <- Validate(
+         Validator.Length(minLen = 0, maxLen = 1),
+         object@ReportClass4
+      )
+      if (isValid != TRUE) {
+         AddMessage(err) <- "Slot @ReportClass4 must contain a string scalar."
+      }
+      # Validate @ReportClass5
+      isValid <- Validate(
+         Validator.Length(minLen = 0, maxLen = 1),
+         object@ReportClass5
+      )
+      if (isValid != TRUE) {
+         AddMessage(err) <- "Slot @ReportClass5 must contain a string scalar."
+      }
       if (NoMessage(err)) {
          return(TRUE)
       } else {
@@ -265,6 +283,8 @@ Cov <- function(issDate = as.Date("1900-01-01"),
                 reportClass1 = character(0L),
                 reportClass2 = character(0L),
                 reportClass3 = character(0L),
+                reportClass4 = character(0L),
+                reportClass5 = character(0L),
                 planId = character(0L),
                 id = character(0L),
                 descrip = character(0L)
@@ -289,6 +309,8 @@ Cov <- function(issDate = as.Date("1900-01-01"),
       ReportClass1 = reportClass1,
       ReportClass2 = reportClass2,
       ReportClass3 = reportClass3,
+      ReportClass4 = reportClass4,
+      ReportClass5 = reportClass5,
       Id = as.character(id),
       Descrip = as.character(descrip)
    )
@@ -585,6 +607,42 @@ setMethod(
    signature = "Cov",
    definition = function(object, value) {
       object@ReportClass3 <- as.character(value)
+      validObject(object)
+      return(object)
+   }
+)
+
+setMethod(
+   f = "GetReportClass4",
+   signature = "Cov",
+   definition = function(object) {
+      return(object@ReportClass4)
+   }
+)
+
+setMethod(
+   f = "SetReportClass4<-",
+   signature = "Cov",
+   definition = function(object, value) {
+      object@ReportClass4 <- as.character(value)
+      validObject(object)
+      return(object)
+   }
+)
+
+setMethod(
+   f = "GetReportClass5",
+   signature = "Cov",
+   definition = function(object) {
+      return(object@ReportClass5)
+   }
+)
+
+setMethod(
+   f = "SetReportClass5<-",
+   signature = "Cov",
+   definition = function(object, value) {
+      object@ReportClass5 <- as.character(value)
       validObject(object)
       return(object)
    }

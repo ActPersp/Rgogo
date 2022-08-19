@@ -9,7 +9,7 @@ RepeatTail <- function(..., len) {
 }
 
 HasValue <- function(x){
-   return(!(is.null(x) || is.na(x) || (length(x) == 0)))
+   return(!(is.null(x) || all(is.na(x)) || (length(x) == 0)))
 }
 
 IsEmptyString <- function(x) {
@@ -292,4 +292,19 @@ To.data.frame <- function(x, itemName, colNames = NA_character_) {
       colnames(df) <- colNames
    }
    return(df)
+}
+
+fgsub <- function(strPattern, replacement, path = ".", fnPattern = NULL) {
+   fileList <- dir(path = path, pattern = pattern, full.names = TRUE)
+   for (f in fileList) {
+      ftmp <- paste0(f, "_")
+      s0 <- readLines(f)
+      lines <- grep(strPattern, s0)
+      if (length(lines) > 0) {
+         s1 <- gsub(strPattern, replacement, s0)
+         writeLines(s1, ftmp)
+         file.remove(f)
+         file.rename(ftmp, f)
+      }
+   }
 }
