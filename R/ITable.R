@@ -113,7 +113,13 @@ setMethod(
          rdaName <- id
       }
       eval(parse(text = paste(rdaName, "<- object")))
-      eval(parse(text = paste("usethis::use_data(", rdaName, ", overwrite = ", overwrite, ")")))
+      # eval(parse(text = paste("usethis::use_data(", rdaName, ", overwrite = ", overwrite, ")")))
+      rdaFileName <- paste0("data/", rdaName, ".rda")
+      if (file.exists(rdaFileName) & !overwrite) {
+         stop(paste0(rdaFileName,": ", "Cannot overwrite.  File already exists."))
+      } else {
+         eval(parse(text = paste0("save(", rdaName, ", file = '", rdaFileName, "')")))
+      }
    }
 )
 

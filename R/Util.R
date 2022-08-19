@@ -295,7 +295,7 @@ To.data.frame <- function(x, itemName, colNames = NA_character_) {
 }
 
 fgsub <- function(strPattern, replacement, path = ".", fnPattern = NULL) {
-   fileList <- dir(path = path, pattern = pattern, full.names = TRUE)
+   fileList <- dir(path = path, pattern = fnPattern, full.names = TRUE)
    for (f in fileList) {
       ftmp <- paste0(f, "_")
       s0 <- readLines(f)
