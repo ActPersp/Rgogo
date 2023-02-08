@@ -40,7 +40,6 @@ Collate:
     'IModel.R'
     'ArgSet.PfadAnlys.R'
     'ArgSet.PremSolver.R'
-    'ArgSet.PremSolver.IA.R'
     'ArgSet.PremSolver.IA.JS.R'
     'ArgSet.ScnrTest.R'
     'ArgSet.UPR.R'

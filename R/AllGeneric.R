@@ -384,8 +384,6 @@ setGeneric(name = "SetSurvrBenPct<-", def = function(object, value) {standardGen
 setGeneric(name = "GetAnutzPeriod", def = function(object, ...) {standardGeneric("GetAnutzPeriod")})
 setGeneric(name = "GetAnutzAge", def = function(object, ...) {standardGeneric("GetAnutzAge")})
 setGeneric(name = "ProjSurChrg", def = function(object, ...) {standardGeneric("ProjSurChrg")})
-setGeneric(name = "GetAnuAdjIndex", def = function(object, ...) {standardGeneric("GetAnuAdjIndex")})
-setGeneric(name = "SetAnuAdjIndex<-", def = function(object, value) {standardGeneric("SetAnuAdjIndex<-")})
 setGeneric(name = "GetAnuBenSchd", def = function(object, ...) {standardGeneric("GetAnuBenSchd")})
 setGeneric(name = "SetAnuBenSchd<-", def = function(object, ...) {standardGeneric("SetAnuBenSchd<-")})
 setGeneric(name = "Get.q", def = function(object, ...) {standardGeneric("Get.q")})

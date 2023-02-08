@@ -125,7 +125,7 @@ DeployProject <- function(pkgName, overwrite = FALSE) {
    devtools::install(quiet = TRUE)
    cat(pkgName, "is deployed successfully.\n")
    cat("Reloading package", pkgName, "\n")
-   devtools::load_all()
+   # devtools::load_all()
 }
 
 TidyUpList <- function(lst) {
@@ -273,6 +273,10 @@ CloneS4Object <- function(object){
 
 IsListOfList <- function(x) {
    return(all(unlist(lapply(x, function(y) {is.list(y)}))))
+}
+
+IsListOf <- function(x, clsName) {
+   return(all(unlist(lapply(x, function(y) {is(y, clsName)}))))
 }
 
 To.data.frame <- function(x, itemName, colNames = NA_character_) {

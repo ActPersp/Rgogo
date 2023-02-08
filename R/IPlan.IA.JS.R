@@ -36,28 +36,28 @@ setValidity(
 )
 
 IPlan.IA.JS <- function(anuYears = NA, anuToAge = NA,
-                        anuMode = 12L, anuTiming = 0L, anuAdjIndex = 0, survrBenPct = 0,
+                        anuMode = 12L, anuTiming = 0L, anuBenSchd = numeric(0L), survrBenPct = 0,
                         premTable = character(0L), polFee = numeric(0), premTaxRate = numeric(0L),
                         commSchd = numeric(0L), ovrdOnPremSchd = numeric(0L), ovrdOnCommSchd = numeric(0L),
                         id = character(0L), descrip = character(0L)) {
-   # Define premium period
-   premPeriod <- c(PremYears = 1 / 12)
    # Define end of annuity payout period, which is the end of coverage period.
    covPeriod <- c(CovYears = anuYears, CovToAge = anuToAge)
    covPeriod <- covPeriod[!is.na(covPeriod)]
    plan <- new(Class = "IPlan.IA.JS",
                CovPeriod = covPeriod,
-               PremPeriod = premPeriod,
+               PremPeriod = c(PremYears = 1/12),
+               AnuStart = c(AnuStartYear = 1),
                AnuMode = anuMode,
                AnuTiming = anuTiming,
-               AnuAdjIndex = anuAdjIndex,
                CrtnMonths = 0L,
+               AnuBenSchd = anuBenSchd,
                SurvrBenPct = survrBenPct,
                PremTable = premTable,
-               ModFactor = numeric(0L),
+               ModFactor = c("1" = 1),
                PolFee = polFee,
                PremTaxRate = premTaxRate,
                CVTable = character(0L),
+               SurChrgSchd = numeric(0L),
                CommSchd = commSchd,
                OvrdOnPremSchd = ovrdOnPremSchd,
                OvrdOnCommSchd = ovrdOnCommSchd,

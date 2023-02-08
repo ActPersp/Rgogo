@@ -1,6 +1,3 @@
-#' @include IPlan.IAJS.R
-NULL
-
 setClass(
    Class = "Model.PremSolver.IA.JS",
    contains = "Model.PremSolver"
@@ -61,6 +58,8 @@ setMethod(
                   )
                   SetIssAge2(cov) <- GetIssAge2(model, cov)
                   SetRiskClass2(cov) <- GetRiskClass2(model, cov)
+                  SetLifeStatus(cov) <- 1L
+                  SetLifeStatus2(cov) <- 1L
                   profitMargin <- GetTargProfitMargin(GetArgs(model), rc, age)
                   tmpResult <- optimize(f = .CalcSolverObjective.IAJS,
                                         interval = GetArgValue(model, "Interval"),
@@ -95,8 +94,12 @@ setMethod(
    f = GetIssAge2,
    signature = "Model.PremSolver.IA.JS",
    definition = function(object, cov) {
-      arg <- GetArgValue(object, "SurvrAgeDiff")
-      issAge2 <- arg[GetRiskClass(cov)] + GetIssAge(cov)
+      ageDiff <- GetArgValue(object, "SurvrAgeDiff")
+      if (length(ageDiff) == 1) {
+         issAge2 <- GetIssAge(cov) + ageDiff
+      } else {
+         issAge2 <- arg[GetRiskClass(cov)] + GetIssAge(cov)
+      }
       return(issAge2)
    }
 )

@@ -15,7 +15,7 @@ setValidity(
          AddMessage(err) <- "Invalid annuitization period.  This shall be an immediate annuity plan."
       }
       # Validate @ModFactor: Cannot set modal factor because this is a single premium product.
-      isValid <- length(object@ModFactor) == 0
+      isValid <- (length(object@ModFactor) == 1) & (object@ModFactor == 1)
       if (isValid != TRUE) {
          AddMessage(err) <- "Cannot set modal factor because this is a single premium product."
       }
@@ -47,8 +47,7 @@ IPlan.IA <- function(anuYears = NA, anuToAge = NA,
    # Define end of annuity payout period, which is also end of coverage period
    covPeriod <- c(CovYears = anuYears, CovToAge = anuToAge)
    covPeriod <- covPeriod[!is.na(covPeriod)]
-   stopifnot(length(covPeriod) > 0)
-   plan <- new(Class = "IPlan.Anu",
+   plan <- new(Class = "IPlan.IA",
                CovPeriod = covPeriod,
                PremPeriod = c(PremYears = 1/12),
                AnuStart = c(AnuStartYear = 1),
@@ -57,7 +56,7 @@ IPlan.IA <- function(anuYears = NA, anuToAge = NA,
                CrtnMonths = crtnMonths,
                AnuBenSchd = anuBenSchd,
                PremTable = premTable,
-               ModFactor = numeric(0L),
+               ModFactor = c("1" = 1),
                PolFee = polFee,
                PremTaxRate = premTaxRate,
                CVTable = character(0L),
@@ -80,13 +79,13 @@ setMethod(
    }
 )
 
-setMethod(
-   f = "GetPolFee",
-   signature = "IPlan.IA",
-   definition = function(object, ...) {
-      return(object@PolFee)
-   }
-)
+# setMethod(
+#    f = "GetPolFee",
+#    signature = "IPlan.IA",
+#    definition = function(object, ...) {
+#       return(object@PolFee)
+#    }
+# )
 
 setMethod(
    f = "GetModPrem",

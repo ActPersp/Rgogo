@@ -1,6 +1,6 @@
 setClass(
    Class = "ArgSet.PremSolver.IA.JS",
-   contains = "ArgSet.PremSolver.IA",
+   contains = "ArgSet.PremSolver",
    slots = c(
       SurvrAgeDiff = "integer",
       SurvrRiskClass = "character"
