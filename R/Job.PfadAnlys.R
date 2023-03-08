@@ -3,7 +3,7 @@ setClass(
    contains = "IJob"
 )
 
-Job.PfadAnlys <- function(inpVars, dispatcher, dbDrvr, dbConnArgs, id, descrip = character(0L)) {
+Job.PfadAnlys <- function(inpVars, dispatcher, dbDrvr = NULL, dbConnArgs = character(0L), id, descrip = character(0L)) {
    job <- new(
       Class = "Job.PfadAnlys",
       InpVars = inpVars,
