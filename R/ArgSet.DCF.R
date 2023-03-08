@@ -1,6 +1,3 @@
-#' @include IIntrAssump.R
-NULL
-
 setClass(
    Class = "ArgSet.DCF",
    contains = "ArgSet.CF",

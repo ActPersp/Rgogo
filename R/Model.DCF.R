@@ -1,6 +1,3 @@
-#' @include Model.CF.R
-NULL
-
 setClass(Class = "Model.DCF", contains = "IModel")
 
 Model.DCF <- function(args = ArgSet.DCF(), id = character(0L), descrip = character(0L)) {
@@ -48,6 +45,8 @@ setMethod(
       } else {
          vAnuBen <- 0
       }
+
+      # Calculate present values of cash flows
       result$PV <- list(
          CovId = ifelse(length(GetId(var)) > 0, GetId(var), NA),
          Prem = ifelse(is.null(cf$Prem), 0, sum(cf$Prem * v0, na.rm = TRUE)),
