@@ -390,7 +390,6 @@ ExportToExcel.Proj <- function(result, annual, digits = integer(), wb = NULL, sh
                          AdminChrg = GetYearlyTotal(v),
                          Expns.Acq = GetYearlyTotal(v),
                          Expns.Mnt = GetYearlyTotal(v),
-                         # rep(NA, length.out = length(tLabel))
                          NA
             )
          }
