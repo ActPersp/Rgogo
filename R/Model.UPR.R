@@ -48,9 +48,7 @@ setMethod(
 .SumrzResult.Model.UPR <- function(model, cov, result) {
    m <- GetPolMonth(GetIssDate(cov), GetArgValue(model, "ValuDate"))
    proj <- result$Proj
-   pv <- result$PV
    res <- result$Res
-   #anlzPrem <- ifelse(is.null(proj$Prem), 0, sum(proj$Prem[m:(m+11)], na.rm = TRUE))
    anlzPrem <- GetModPrem(cov) * GetPremMode(cov)
    curCV <- ifelse(is.null(proj$CV), 0, proj$CV[m])
    grossSumInsd <- ifelse(is.null(proj$Ben.Dth), 0, proj$Ben.Dth[m]) + ifelse(is.null(proj$Ben.Dth.PUA), 0, proj$Ben.Dth.PUA[m])
@@ -90,4 +88,25 @@ setMethod(
    return(df)
 }
 
+
+setMethod(
+   f = "Run",
+   signature = c("Model.UPR", "Cov2"),
+   definition = function(object, var, result = list()) {
+      result <- callNextMethod()
+      lives <- GetCovCount(var)
+      result$Res$Res.Gross <- result$Res$Res.Gross * lives
+      result$Res$Res.Rein <- result$Res$Res.Rein * lives
+      result$Res$Res.Net <- result$Res$Res.Net * lives
+      result$ValuSumm$AnlzPrem <- result$ValuSumm$AnlzPrem * lives
+      result$ValuSumm$CV <- result$ValuSumm$CV * lives
+      result$ValuSumm$GrossSumInsd <- result$ValuSumm$GrossSumInsd * lives
+      result$ValuSumm$ReinSumInsd <- result$ValuSumm$ReinSumInsd * lives
+      result$ValuSumm$NetSumInsd <- result$ValuSumm$NetSumInsd * lives
+      result$ValuSumm$GrossRes <- result$ValuSumm$GrossRes * lives
+      result$ValuSumm$ReinRes <- result$ValuSumm$ReinRes * lives
+      result$ValuSumm$NetRes <- result$ValuSumm$NetRes * lives
+      return(result)
+   }
+)
 

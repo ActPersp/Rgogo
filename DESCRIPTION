@@ -48,6 +48,7 @@ Collate:
     'IPlan.R'
     'IPlan.Fund.R'
     'Cov.R'
+    'Cov2.R'
     'Db.DBI.R'
     'Db.SQLite.R'
     'Db.Postgres.R'

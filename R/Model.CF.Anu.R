@@ -258,3 +258,25 @@ setMethod(
    }
 )
 
+
+setMethod(
+   f = "Run.CF",
+   signature = c("Model.CF", "IPlan.Anu", "Cov2"),
+   definition = function(object, plan, cov, result) {
+      result <- callNextMethod()
+      lives <- GetCovCount(cov)
+      cfCols <- names(result$Cf)[!names(result$Cf) %in% c("CovId", "Timeline")]
+      for (colName in cfCols) {
+         if (any(colName == cfCols)) {
+            eval(expr = parse(text = paste0("result$Cf$`", colName, "` <- result$Cf$`", colName, "` * lives")))
+         }
+      }
+      projLen <- GetProjLen(result$Timeline)
+      covProjLen <- GetCovProjLen(result$Timeline)
+      result$Cf <- cbind(
+         result$Cf,
+         data.frame(Lives = c(rep(0, length.out = projLen - covProjLen), lives * result$Assump$pn))
+      )
+      return(result)
+   }
+)

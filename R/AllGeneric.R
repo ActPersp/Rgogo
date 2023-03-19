@@ -435,3 +435,5 @@ setGeneric(name = "GetMortMultExtra", def = function(object) {standardGeneric("G
 setGeneric(name = "SetMortMultExtra<-", def = function(object, value) {standardGeneric("SetMortMultExtra<-")})
 setGeneric(name = "GetMortMultExtra2", def = function(object) {standardGeneric("GetMortMultExtra2")})
 setGeneric(name = "SetMortMultExtra2<-", def = function(object, value) {standardGeneric("SetMortMultExtra2<-")})
+setGeneric(name = "GetCovCount", def = function(object) {standardGeneric("GetCovCount")})
+setGeneric(name = "SetCovCount<-", def = function(object, value) {standardGeneric("SetCovCount<-")})
