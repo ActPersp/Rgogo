@@ -62,48 +62,112 @@ setMethod(
    }
 )
 
-.SumrzResult.Model.PPM <- function(model, cov, result) {
-   m <- GetProjPolMonths(result$Timeline)[1]
-   proj <- result$Proj
-   pv <- result$PV
-   res <- result$Res
-   anlzPrem <- ifelse(is.null(proj$Prem), 0, sum(proj$Prem[m:(m + 12 - 1)], na.rm = TRUE))
-   curCV <- ifelse(is.null(proj$CV), 0, proj$CV[m])
-   grossSumInsd <- ifelse(is.null(proj$Ben.Dth), 0, proj$Ben.Dth[m]) + ifelse(is.null(proj$Ben.Dth.PUA), 0, proj$Ben.Dth.PUA[m])
-   reinSumInsd <- ifelse(is.null(proj$Rein.Ben), 0, proj$Rein.Ben[m])
-   df <- list(
-      CovId = ifelse(length(GetId(cov)) > 0, GetId(cov), NA),
-      PlanId = GetId(GetPlan(cov)),
-      AnlzPrem = anlzPrem,
-      CV = curCV,
-      GrossSumInsd = grossSumInsd,
-      ReinSumInsd = reinSumInsd,
-      NetSumInsd = grossSumInsd - reinSumInsd,
-      GrossRes = res$Res.Gross,
-      ReinRes = res$Res.Rein,
-      NetRes = res$Res.Net,
-      LiabDur = GetProjLen(result$Timeline),
-      PV.Prem = ifelse(is.null(pv$Prem), 0, pv$Prem),
-      PV.Prem.Tax = ifelse(is.null(pv$Prem.Tax), 0, pv$Prem.Tax),
-      PV.Comm = ifelse(is.null(pv$Comm), 0, pv$Comm),
-      PV.Comm.Ovrd = ifelse(is.null(pv$Comm.Ovrd), 0, pv$Comm.Ovrd),
-      PV.Ben.Dth = ifelse(is.null(pv$Ben.Dth), 0, pv$Ben.Dth),
-      PV.Ben.Mat = ifelse(is.null(pv$Ben.Mat), 0, pv$Ben.Mat),
-      PV.Ben.Sur = ifelse(is.null(pv$Ben.Sur), 0, pv$Ben.Sur),
-      PV.Ben.Anu = ifelse(is.null(pv$Ben.Anu), 0, pv$Ben.Anu),
-      PV.Ben.Dth.PUA = ifelse(is.null(pv$Ben.Dth.PUA), 0, pv$Ben.Dth.PUA),
-      PV.Ben.Mat.PUA = ifelse(is.null(pv$Ben.Mat.PUA), 0, pv$Ben.Mat.PUA),
-      PV.Ben.Sur.PUA = ifelse(is.null(pv$Ben.Sur.PUA), 0, pv$Ben.Sur.PUA),
-      PV.Expns.Acq = ifelse(is.null(pv$Expns.Acq), 0, pv$Expns.Acq),
-      PV.Expns.Mnt = ifelse(is.null(pv$Expns.Mnt), 0, pv$Expns.Mnt),
-      PV.Rein.Prem = ifelse(is.null(pv$Rein.Prem), 0, pv$Rein.Prem),
-      PV.Rein.Comm = ifelse(is.null(pv$Rein.Comm), 0, pv$Rein.Comm),
-      PV.Rein.Ben = ifelse(is.null(pv$Rein.Ben), 0, pv$Rein.Ben),
-      PV.Rein.Prem.Rfnd = ifelse(is.null(pv$Rein.Prem.Rfnd), 0, pv$Rein.Prem.Rfnd),
-      PV.Rein.Comm.Rfnd = ifelse(is.null(pv$Rein.Comm.Rfnd), 0, pv$Rein.Comm.Rfnd)
-   )
-   return(df)
-}
+
+setMethod(
+   f = ".SumrzResult.Model.PPM",
+   signature = c("Model.PPM", "Cov", "list"),
+   definition = function(object, cov, result = list()) {
+      m <- GetProjPolMonths(result$Timeline)[1]
+      proj <- result$Proj
+      pv <- result$PV
+      res <- result$Res
+      anlzPrem <- ifelse(is.null(proj$Prem), 0, sum(proj$Prem[m:(m + 12 - 1)], na.rm = TRUE))
+      curCV <- ifelse(is.null(proj$CV), 0, proj$CV[m])
+      grossSumInsd <- ifelse(is.null(proj$Ben.Dth), 0, proj$Ben.Dth[m]) + ifelse(is.null(proj$Ben.Dth.PUA), 0, proj$Ben.Dth.PUA[m])
+      reinSumInsd <- ifelse(is.null(proj$Rein.Ben), 0, proj$Rein.Ben[m])
+      df <- list(
+         CovId = ifelse(length(GetId(cov)) > 0, GetId(cov), NA),
+         PlanId = GetId(GetPlan(cov)),
+         AnlzPrem = anlzPrem,
+         CV = curCV,
+         GrossSumInsd = grossSumInsd,
+         ReinSumInsd = reinSumInsd,
+         NetSumInsd = grossSumInsd - reinSumInsd,
+         GrossRes = res$Res.Gross,
+         ReinRes = res$Res.Rein,
+         NetRes = res$Res.Net,
+         LiabDur = GetProjLen(result$Timeline),
+         PV.Prem = ifelse(is.null(pv$Prem), 0, pv$Prem),
+         PV.Prem.Tax = ifelse(is.null(pv$Prem.Tax), 0, pv$Prem.Tax),
+         PV.Comm = ifelse(is.null(pv$Comm), 0, pv$Comm),
+         PV.Comm.Ovrd = ifelse(is.null(pv$Comm.Ovrd), 0, pv$Comm.Ovrd),
+         PV.Ben.Dth = ifelse(is.null(pv$Ben.Dth), 0, pv$Ben.Dth),
+         PV.Ben.Mat = ifelse(is.null(pv$Ben.Mat), 0, pv$Ben.Mat),
+         PV.Ben.Sur = ifelse(is.null(pv$Ben.Sur), 0, pv$Ben.Sur),
+         PV.Ben.Anu = ifelse(is.null(pv$Ben.Anu), 0, pv$Ben.Anu),
+         PV.Ben.Dth.PUA = ifelse(is.null(pv$Ben.Dth.PUA), 0, pv$Ben.Dth.PUA),
+         PV.Ben.Mat.PUA = ifelse(is.null(pv$Ben.Mat.PUA), 0, pv$Ben.Mat.PUA),
+         PV.Ben.Sur.PUA = ifelse(is.null(pv$Ben.Sur.PUA), 0, pv$Ben.Sur.PUA),
+         PV.Expns.Acq = ifelse(is.null(pv$Expns.Acq), 0, pv$Expns.Acq),
+         PV.Expns.Mnt = ifelse(is.null(pv$Expns.Mnt), 0, pv$Expns.Mnt),
+         PV.Rein.Prem = ifelse(is.null(pv$Rein.Prem), 0, pv$Rein.Prem),
+         PV.Rein.Comm = ifelse(is.null(pv$Rein.Comm), 0, pv$Rein.Comm),
+         PV.Rein.Ben = ifelse(is.null(pv$Rein.Ben), 0, pv$Rein.Ben),
+         PV.Rein.Prem.Rfnd = ifelse(is.null(pv$Rein.Prem.Rfnd), 0, pv$Rein.Prem.Rfnd),
+         PV.Rein.Comm.Rfnd = ifelse(is.null(pv$Rein.Comm.Rfnd), 0, pv$Rein.Comm.Rfnd)
+      )
+      return(df)
+   }
+)
+
+
+setMethod(
+   f = ".SumrzResult.Model.PPM",
+   signature = c("Model.PPM", "Cov2", "list"),
+   definition = function(object, cov, result = list()) {
+      lst <- callNextMethod()
+      covCount <- GetCovCount(cov)
+      lst$AnlzPrem <- lst$AnlzPrem * covCount
+      lst$CV <- lst$CV * covCount
+      lst$GrossSumInsd <- lst$GrossSumInsd * covCount
+      lst$ReinSumInsd <- lst$ReinSumInsd * covCount
+      lst$NetSumInsd <- lst$NetSumInsd * covCount
+      return(lst)
+   }
+)
+
+# .SumrzResult.Model.PPM <- function(model, cov, result) {
+#    m <- GetProjPolMonths(result$Timeline)[1]
+#    proj <- result$Proj
+#    pv <- result$PV
+#    res <- result$Res
+#    anlzPrem <- ifelse(is.null(proj$Prem), 0, sum(proj$Prem[m:(m + 12 - 1)], na.rm = TRUE))
+#    curCV <- ifelse(is.null(proj$CV), 0, proj$CV[m])
+#    grossSumInsd <- ifelse(is.null(proj$Ben.Dth), 0, proj$Ben.Dth[m]) + ifelse(is.null(proj$Ben.Dth.PUA), 0, proj$Ben.Dth.PUA[m])
+#    reinSumInsd <- ifelse(is.null(proj$Rein.Ben), 0, proj$Rein.Ben[m])
+#    df <- list(
+#       CovId = ifelse(length(GetId(cov)) > 0, GetId(cov), NA),
+#       PlanId = GetId(GetPlan(cov)),
+#       AnlzPrem = anlzPrem,
+#       CV = curCV,
+#       GrossSumInsd = grossSumInsd,
+#       ReinSumInsd = reinSumInsd,
+#       NetSumInsd = grossSumInsd - reinSumInsd,
+#       GrossRes = res$Res.Gross,
+#       ReinRes = res$Res.Rein,
+#       NetRes = res$Res.Net,
+#       LiabDur = GetProjLen(result$Timeline),
+#       PV.Prem = ifelse(is.null(pv$Prem), 0, pv$Prem),
+#       PV.Prem.Tax = ifelse(is.null(pv$Prem.Tax), 0, pv$Prem.Tax),
+#       PV.Comm = ifelse(is.null(pv$Comm), 0, pv$Comm),
+#       PV.Comm.Ovrd = ifelse(is.null(pv$Comm.Ovrd), 0, pv$Comm.Ovrd),
+#       PV.Ben.Dth = ifelse(is.null(pv$Ben.Dth), 0, pv$Ben.Dth),
+#       PV.Ben.Mat = ifelse(is.null(pv$Ben.Mat), 0, pv$Ben.Mat),
+#       PV.Ben.Sur = ifelse(is.null(pv$Ben.Sur), 0, pv$Ben.Sur),
+#       PV.Ben.Anu = ifelse(is.null(pv$Ben.Anu), 0, pv$Ben.Anu),
+#       PV.Ben.Dth.PUA = ifelse(is.null(pv$Ben.Dth.PUA), 0, pv$Ben.Dth.PUA),
+#       PV.Ben.Mat.PUA = ifelse(is.null(pv$Ben.Mat.PUA), 0, pv$Ben.Mat.PUA),
+#       PV.Ben.Sur.PUA = ifelse(is.null(pv$Ben.Sur.PUA), 0, pv$Ben.Sur.PUA),
+#       PV.Expns.Acq = ifelse(is.null(pv$Expns.Acq), 0, pv$Expns.Acq),
+#       PV.Expns.Mnt = ifelse(is.null(pv$Expns.Mnt), 0, pv$Expns.Mnt),
+#       PV.Rein.Prem = ifelse(is.null(pv$Rein.Prem), 0, pv$Rein.Prem),
+#       PV.Rein.Comm = ifelse(is.null(pv$Rein.Comm), 0, pv$Rein.Comm),
+#       PV.Rein.Ben = ifelse(is.null(pv$Rein.Ben), 0, pv$Rein.Ben),
+#       PV.Rein.Prem.Rfnd = ifelse(is.null(pv$Rein.Prem.Rfnd), 0, pv$Rein.Prem.Rfnd),
+#       PV.Rein.Comm.Rfnd = ifelse(is.null(pv$Rein.Comm.Rfnd), 0, pv$Rein.Comm.Rfnd)
+#    )
+#    return(df)
+# }
 
 ExportToExcel.Model.PPM <- function(result, dir, annual = TRUE, digits = 0, overwrite = FALSE) {
    dir.create(path = dir, showWarnings = "FALSE", recursive = TRUE)

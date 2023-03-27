@@ -437,3 +437,4 @@ setGeneric(name = "GetMortMultExtra2", def = function(object) {standardGeneric("
 setGeneric(name = "SetMortMultExtra2<-", def = function(object, value) {standardGeneric("SetMortMultExtra2<-")})
 setGeneric(name = "GetCovCount", def = function(object) {standardGeneric("GetCovCount")})
 setGeneric(name = "SetCovCount<-", def = function(object, value) {standardGeneric("SetCovCount<-")})
+setGeneric(name = ".SumrzResult.Model.PPM", def = function(object, cov, result) {standardGeneric(".SumrzResult.Model.PPM")})
