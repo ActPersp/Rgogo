@@ -3,11 +3,12 @@ setClass(
    contains = "IJob",
    slots = c(
       DbAppend = "logical",
-      CfExportYears = "numeric"
+      CfExportYears = "numeric",
+      ProjExportYears = "numeric"
    )
 )
 
-Job.Valuation <- function(inpVars, dispatcher, dbDrvr = NULL, dbConnArgs = character(0L), cfExportYears = NA_integer_, dbAppend = FALSE, id, descrip = character(0L), ...) {
+Job.Valuation <- function(inpVars, dispatcher, dbDrvr = NULL, dbConnArgs = character(0L), cfExportYears = NA_integer_, projExportYears = NA_integer_, dbAppend = FALSE, id, descrip = character(0L), ...) {
    job <- new(
       Class = "Job.Valuation",
       InpVars = inpVars,
@@ -16,6 +17,7 @@ Job.Valuation <- function(inpVars, dispatcher, dbDrvr = NULL, dbConnArgs = chara
       DbConnArgs = dbConnArgs,
       DbAppend = dbAppend,
       CfExportYears = cfExportYears,
+      ProjExportYears = projExportYears,
       Descrip = as.character(descrip)
    )
    SetJobId(job) <- as.character(id)
@@ -83,6 +85,7 @@ setMethod(
    definition = function(object, result) {
       jobId <- GetJobId(object)
       valuSumm <- cbind(JobId = jobId, To.data.frame(result, "ValuSumm"))
+
       cfLen <- round(GetCfExportYears(object) * 12, digits = 0)
       if (!is.na(cfLen)) {
          result <- lapply(
@@ -101,8 +104,40 @@ setMethod(
             }
          )
       }
-      # Output job results
       cf <- To.data.frame(result, "Cf")
+
+
+      # Output coverage illustration.  This section needs to be reviewed
+      projLen <- round(object@ProjExportYears * 12, digits = 0)
+      if (!is.na(projLen)) {
+         result <- lapply(
+            result,
+            function(rslt) {
+               if (!is.null(rslt$Proj)) {
+                  projStartDate <- GetArgValue(rslt$ArgSet, "ValuDate") + 1
+                  projDates <- projStartDate %m+% months(0:(projLen - 1))
+                  projTimeline <- paste0(lubridate::year(projDates), "-", sprintf(fmt = "%02d", lubridate::month(projDates)))
+                  inTimeline <- rslt$Proj$Timeline %in% projTimeline
+                  rslt$Proj <- lapply(
+                     rslt$Proj,
+                     function(proj) {
+                        proj <- proj[inTimeline]
+                        return(proj)
+                     }
+                  )
+                  rslt$Proj <- dplyr::bind_cols(
+                     CovId = GetId(rslt$CovData),
+                     data.frame(rslt$Proj)
+                  )
+               }
+               return(rslt)
+            }
+         )
+         s <- paste(paste0("result[[", 1:length(result), "]]$Proj"),  collapse = ",")
+         eval(expr = parse(text = paste0("proj <- dplyr::bind_rows(", s, ")")))
+      }
+
+      # Output job results
       conn <- ConnectDb(object)
       if (!is.null(conn)) {
          WriteTable.ValuSumm(conn, valuSumm)
@@ -113,7 +148,8 @@ setMethod(
          CompactDb(conn)
          DisconnectDb(conn)
       }
-      return(list(ValuSumm = valuSumm, Cf = cf))
+      # return(list(ValuSumm = valuSumm, Cf = cf))
+      return(list(ValuSumm = valuSumm, Cf = cf, Proj = proj))
    }
 )
 

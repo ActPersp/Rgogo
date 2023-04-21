@@ -58,6 +58,8 @@ setMethod(
             length(result$Cf[[i]]) <- len
          }
       }
+      result$CovData <- var
+      result$ArgSet <- GetArgs(object)
       return(result)
    }
 )

@@ -41,6 +41,8 @@ setMethod(
       )
       result$UrndProp <- urndProp
       result$ValuSumm <- .SumrzResult.Model.UPR(object, var, result)
+      result$CovData <- var
+      result$ArgSet <- GetArgs(object)
       return(result)
    }
 )
