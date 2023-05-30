@@ -219,7 +219,10 @@ setMethod(
 setMethod(
    f = "GetModFactor",
    signature = "IPlan.LT",
-   definition = function(object, premMode) {
+   definition = function(object, premMode = NA_integer_) {
+      if (is.na(premMode)) {
+         return(object@ModFactor)
+      }
       if (HasValue(object@ModFactor)) {
          return(as.numeric(object@ModFactor[as.character(premMode)]))
       } else {

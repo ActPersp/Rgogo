@@ -22,7 +22,6 @@ CreateProject <- function(projId, loc = getwd(), msgPath = character(0L)) {
          # Create DESCRIPTION file:
          descripFields <- list(
             Package = projId,
-            #Type = "Package",
             Version = "0.0.1",
             License = "To be specified",
             Title = "To be specified",
@@ -41,6 +40,23 @@ CreateProject <- function(projId, loc = getwd(), msgPath = character(0L)) {
             'import("Rgogo")'
          )
          WriteNamespaceFile(content, projRoot)
+         # Create RProj file:
+         projInfoFields <- list(
+            Version = "1.0",
+            RestoreWorkspace = "Default",
+            SaveWorkspace = "Default",
+            AlwaysSaveHistory = "Default",
+            EnableCodeIndexing = "Yes",
+            UseSpacesForTab = "Yes",
+            NumSpacesForTab = "3",
+            Encoding = "UTF-8",
+            RnwWeave = "Sweave",
+            LaTeX = "pdfLaTeX",
+            BuildType = "Package",
+            PackageUseDevtools = "Yes",
+            PackageInstallArgs = "--no-multiarch --with-keep.source"
+         )
+         WriteProjFile(projId, projInfoFields, projRoot)
          # Create sub-folders under project root.
          for (subdir in c("R", "data", "batch", "export", "data-raw", "db")) {
             dir.create(file.path(projRoot, subdir))
@@ -147,4 +163,18 @@ WriteNamespaceFile <- function(content, projRoot = character()) {
    close(f)
 }
 
+WriteProjFile <- function(projId, projInfoFields, projRoot = character()) {
+   if (length(projRoot) > 0 & !endsWith(projRoot, "/")) {
+      projRoot <- paste0(projRoot, "/")
+   }
+   path <- paste0(projRoot, projId, ".Rproj")
+   f <- file(path)
+   s <- character()
+   for (key in names(projInfoFields)) {
+      value <- eval(expr = parse(text = paste0("projInfoFields$'", key, "'")))
+      s <- c(s, paste0(key, ": ", paste0(value, collapse = "\n")))
+   }
+   writeLines(s, f)
+   close(f)
+}
 

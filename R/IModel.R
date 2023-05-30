@@ -1,6 +1,3 @@
-#' @include IArgSet.R
-NULL
-
 setClass(
    Class = "IModel",
    contains = c("IObject", "VIRTUAL"),
@@ -100,14 +97,3 @@ setMethod(
    }
 )
 
-# setMethod(
-#    f = "SaveAsRda",
-#    signature = "IModel",
-#    definition = function(object, overwrite = FALSE) {
-#       stopifnot(HasValue(id <- GetId(object)))
-#       rdaName <- paste0(ifelse(startsWith(id, "Model."), "", "Model."), id)
-#       eval(parse(text = paste(rdaName, "<- object")))
-#       eval(parse(text = paste("usethis::use_data(", rdaName, ", overwrite = ", overwrite, ")")))
-#    }
-# )
-#

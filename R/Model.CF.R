@@ -8,16 +8,26 @@ Model.CF <- function(args = ArgSet.CF(), descrip = character(0L), id = character
 
 setMethod(
    f = "Run",
-   signature = c("Model.CF", "Cov"),
-   definition = function(object, var, result) {
+   signature = c("Model.CF", "list", "list"),
+   definition = function(object, var, result = list()) {
       projStartDate <- GetArgValue(object, "ProjStartDate")
-      if (projStartDate <= GetExpiryDate(var)) {
-         result$CovData <- var
+      plan <- var[["plan"]]
+      cov <- var[["cov"]]
+      if (projStartDate <= GetExpiryDate(plan, cov)) {
+         result$CovData <- cov
          result$.ArgSet <- GetArgs(object)
-         return(Run.CF(object, GetPlan(var), var, result))
+         return(Run.CF(object, plan, cov, result))
       } else {
          stop("The coverage has expired before projection starting date.")
       }
+   }
+)
+
+setMethod(
+   f = "Run",
+   signature = c("Model.CF", "Cov", "list"),
+   definition = function(object, var, result = list()) {
+      Run(object, list(plan = GetPlan(var), cov = var), result)
    }
 )
 

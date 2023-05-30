@@ -8,16 +8,25 @@ Model.DCF <- function(args = ArgSet.DCF(), id = character(0L), descrip = charact
 
 setMethod(
    f = "Run",
-   signature = c("Model.DCF", "Cov"),
+   signature = c("Model.DCF", "Cov", "list"),
+   definition = function(object, var, result = list()) {
+      Run(object, list(cov = var, plan = GetPlan(var)), result)
+   }
+)
+
+
+setMethod(
+   f = "Run",
+   signature = c("Model.DCF", "list", "list"),
    definition = function(object, var, result = list()) {
       args <- GetArgs(object)
       projStartDate <- GetArgValue(args, "ProjStartDate")
-      plan <- GetPlan(var)
       # Run cash flow projection
       modelCF <- Model.CF(args)
       result <- Run(modelCF, var, result = result)
 
       # Get interest assumption information
+      plan <- var[["plan"]]
       covProjLen <- GetCovProjLen(result$Timeline)
       covProjTimeIndex <- GetCovProjTimeIndex(result$Timeline)
       result <- GetAssump(GetArgValue(args, "IntrAssump"), assumpInfo = result)
@@ -48,7 +57,7 @@ setMethod(
 
       # Calculate present values of cash flows
       result$PV <- list(
-         CovId = ifelse(length(GetId(var)) > 0, GetId(var), NA),
+         CovId = ifelse(length(GetId(var[["cov"]])) > 0, GetId(var[["cov"]]), NA),
          Prem = ifelse(is.null(cf$Prem), 0, sum(cf$Prem * v0, na.rm = TRUE)),
          Prem.Tax = sum(cf$Prem.Tax * v0, na.rm = TRUE),
          Comm =  sum(cf$Comm * v0, na.rm = TRUE),

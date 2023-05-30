@@ -1,5 +1,4 @@
-RepeatTail <- function(..., len) {
-   v <- unlist(list(...))
+RepeatTail <- function(v, len) {
    if (length(v) < len) {
       v <- c(v, rep(v[length(v)], length.out = len - length(v)))
    } else {
@@ -44,21 +43,24 @@ GetMonthDiff <- function(date1, date2){
    return(diff)
 }
 
-.UniformDistribution <- function(qx, m) {
+Convert_qx_ud <- function(qx, m) {
+   # Uniform distribution assumption
    years <- length(qx)
    k <- matrix(data = rep(0:(m-1), times = years), ncol = m, byrow = TRUE)
    qm <- as.vector(t((qx / m) / (1 - k * qx / m)))
    return(qm)
 }
 
-.ConstantForceMortality <- function(qx, m) {
+Convert_qx_cf <- function(qx, m) {
+   # /Constant force of mortality assumption
    years <- length(qx)
    k <- matrix(data = rep(1, times = years * m), ncol = m, byrow = TRUE)
    qm <- as.vector(t(1 - (1 - k * qx) ^ (1 / m)))
    return(qm)
 }
 
-.Balducci <- function(qx, m) {
+Convert_qx_ba <- function(qx, m) {
+   # Balducci assumption
    years <- length(qx)
    k <- matrix(data = rep(0:(m-1), times = years), ncol = m, byrow = TRUE)
    qm <- as.vector(t((qx / m) / (1 - (m - 1 - k) / m * qx)))
@@ -71,9 +73,9 @@ Convert_qx <- function(qx, m, method) {
       return(qx)
    } else {
       qm <- switch(method,
-                   "ud" = .UniformDistribution(qx, m),
-                   "cf" = .ConstantForceMortality(qx, m),
-                   "ba" = .Balducci(qx, m),
+                   "ud" = Convert_qx_ud(qx, m),
+                   "cf" = Convert_qx_cf(qx, m),
+                   "ba" = Convert_qx_ba(qx, m),
                    stop("Method must be one of the following: 'ud', 'cf', 'ba'")
       )
       return(qm)
