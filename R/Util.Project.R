@@ -178,3 +178,54 @@ WriteProjFile <- function(projId, projInfoFields, projRoot = character()) {
    close(f)
 }
 
+
+DeployObject <- function(pkgName, objectType, overwrite = TRUE) {
+   # # Identify all objects in the package which match the project type.
+   funcList <- strsplit(eval(expr = parse(text = paste0("ls('package:", pkgName, "', pattern = '", paste0('^New.', objectType, '.'), "')"))), " ")
+   if (length(funcList) == 0) return(paste0(objectType,": nothing to deploy."))
+   # Save the identified objects as Rda data.
+   lapply(funcList,
+          function(funcName, pkg, ow) {
+             if (is.function(eval(expr = parse(text = funcName)))) {
+                objName <- substr(funcName, 5, nchar(funcName))
+                objExists <- objName %in% data(package=pkg)$results[,"Item"]
+                if(ow | !objExists) {
+                   cat("-- Deploying", objName, "...")
+                   eval(expr = parse(text = paste0("obj <- ", funcName, "()")))
+                   if (length(GetId(obj)) == 0) {
+                      SetId(obj) <- objName
+                   } else if (GetId(obj) != objName) {
+                      stop(paste0("Object deployed by function ", funcName, " has an inconsistent identifier ", GetId(obj)))
+                   }
+                   eval(expr = parse(text = paste0(objName, " <- obj" )))
+                   eval(expr = parse(text = paste0("save(", objName, ", file = 'data/", objName, ".rda')")))
+                   cat("done", "\n")
+                }
+             }
+          }, pkgName, overwrite
+   )
+}
+
+
+DeployProject <- function(pkgName, overwrite = TRUE) {
+   cat("Start deploying project", pkgName, "...\n")
+   devtools::load_all(export_all = FALSE)
+   DeployObject(pkgName, "Plan", overwrite)
+   DeployObject(pkgName, "MortAssump", overwrite)
+   DeployObject(pkgName, "LapseAssump", overwrite)
+   DeployObject(pkgName, "ExpnsAssump", overwrite)
+   DeployObject(pkgName, "IntrAssump", overwrite)
+   DeployObject(pkgName, "PremAssump", overwrite)
+   DeployObject(pkgName, "IntrCredAssump", overwrite)
+   DeployObject(pkgName, "PUA", overwrite)
+   DeployObject(pkgName, "Rein", overwrite)
+   DeployObject(pkgName, "ArgSet", overwrite)
+   DeployObject(pkgName, "Model", overwrite)
+   DeployObject(pkgName, "Const", overwrite)
+   cat("Model components are deployed successfully.\n")
+   cat("Remeber to install package before running models.")
+   # cat("Installing package", pkgName, "\n")
+   # devtools::install(quiet = TRUE)
+   # cat(pkgName, "is deployed successfully.\n")
+   # cat("Reloading package", pkgName, "\n")
+}

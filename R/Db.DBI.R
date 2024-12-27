@@ -325,7 +325,7 @@ setMethod(
 setMethod(
    f = "WriteTable.Pfad",
    signature = c("DBIConnection", "ANY"),
-   definition = function(conn, data, append = TRUE, colExpandable = FALSE) {
+   definition = function(conn, data, append = TRUE, colExpandable = TRUE) {
       names(data) <- gsub("\\.", "", names(data))
       WriteTable(conn, "Pfad", data, append, colExpandable)
    }

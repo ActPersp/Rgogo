@@ -30,18 +30,18 @@ FillTail <- function(v, filler, len){
    return(v)
 }
 
-GetMonthDiff <- function(date1, date2){
-   date1 <- as.Date(date1)
-   y1 <- as.integer(format(date1,'%Y'))
-   m1 <- as.integer(format(date1,'%m'))
-   d1 <- as.integer(format(date1,'%d'))
-   date2 <- as.Date(date2)
-   y2 <- as.integer(format(date2,'%Y'))
-   m2 <- as.integer(format(date2,'%m'))
-   d2 <- as.integer(format(date2,'%d'))
-   diff <- (y2 - y1) * 12 + (m2 - m1) + (d2 - d1) / 31
-   return(diff)
-}
+# GetMonthDiff <- function(date1, date2){
+#    date1 <- as.Date(date1)
+#    y1 <- as.integer(format(date1,'%Y'))
+#    m1 <- as.integer(format(date1,'%m'))
+#    d1 <- as.integer(format(date1,'%d'))
+#    date2 <- as.Date(date2)
+#    y2 <- as.integer(format(date2,'%Y'))
+#    m2 <- as.integer(format(date2,'%m'))
+#    d2 <- as.integer(format(date2,'%d'))
+#    diff <- (y2 - y1) * 12 + (m2 - m1) + (d2 - d1) / 31
+#    return(diff)
+# }
 
 Convert_qx_ud <- function(qx, m) {
    # Uniform distribution assumption
@@ -82,55 +82,6 @@ Convert_qx <- function(qx, m, method) {
    }
 }
 
-DeployObject <- function(pkgName, objectType, overwrite = TRUE) {
-   # # Identify all objects in the package which match the project type.
-   funcList <- strsplit(eval(expr = parse(text = paste0("ls('package:", pkgName, "', pattern = '", paste0('^New.', objectType, '.'), "')"))), " ")
-   if (length(funcList) == 0) return(paste0(objectType,": nothing to deploy."))
-   # Save the identified objects as Rda data.
-   lapply(funcList,
-          function(funcName, pkg, ow) {
-             if (is.function(eval(expr = parse(text = funcName)))) {
-                objName <- substr(funcName, 5, nchar(funcName))
-                objExists <- objName %in% data(package=pkg)$results[,"Item"]
-                if(ow | !objExists) {
-                   cat("-- Deploying", objName, "...")
-                   eval(expr = parse(text = paste0("obj <- ", funcName, "()")))
-                   if (length(GetId(obj)) == 0) {
-                      SetId(obj) <- objName
-                   } else if (GetId(obj) != objName) {
-                      stop(paste0("Object deployed by function ", funcName, " has an inconsistent identifier ", GetId(obj)))
-                   }
-                   eval(expr = parse(text = paste0(objName, " <- obj" )))
-                   eval(expr = parse(text = paste0("save(", objName, ", file = 'data/", objName, ".rda')")))
-                   cat("done", "\n")
-                }
-             }
-          }, pkgName, overwrite
-   )
-}
-
-DeployProject <- function(pkgName, overwrite = TRUE) {
-   cat("Start deploying project", pkgName, "...\n")
-   devtools::load_all(export_all = FALSE)
-   DeployObject(pkgName, "Plan", overwrite)
-   DeployObject(pkgName, "MortAssump", overwrite)
-   DeployObject(pkgName, "LapseAssump", overwrite)
-   DeployObject(pkgName, "ExpnsAssump", overwrite)
-   DeployObject(pkgName, "IntrAssump", overwrite)
-   DeployObject(pkgName, "PremAssump", overwrite)
-   DeployObject(pkgName, "IntrCredAssump", overwrite)
-   DeployObject(pkgName, "PUA", overwrite)
-   DeployObject(pkgName, "Rein", overwrite)
-   DeployObject(pkgName, "ArgSet", overwrite)
-   DeployObject(pkgName, "Model", overwrite)
-   DeployObject(pkgName, "Const", overwrite)
-   cat("Model components are deployed successfully.\n")
-   cat("Remeber to install package before running models.")
-   # cat("Installing package", pkgName, "\n")
-   # devtools::install(quiet = TRUE)
-   # cat(pkgName, "is deployed successfully.\n")
-   # cat("Reloading package", pkgName, "\n")
-}
 
 TidyUpList <- function(lst) {
    stopifnot(is.list(lst))
@@ -318,3 +269,20 @@ fgsub <- function(strPattern, replacement, path = ".", fnPattern = NULL) {
       }
    }
 }
+
+
+`%df/%` <- function(df, x) {
+   stopifnot(is.data.frame(df))
+   stopifnot(is.numeric(x) & length(x) == 1)
+   for (i in seq_along(colnames(df))) {
+      v <- eval(expr = parse(text = paste0("df$`", colnames(df)[i], "`")))
+      if (is.numeric(v)) {
+         v <- v / x
+      }
+      eval(expr = parse(text = paste0("df$`", colnames(df)[i], "` <- v")))
+   }
+   return(df)
+}
+
+
+
