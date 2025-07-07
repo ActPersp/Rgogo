@@ -286,3 +286,75 @@ fgsub <- function(strPattern, replacement, path = ".", fnPattern = NULL) {
 
 
 
+replace_string_in_r_files <- function(path, str1, str2) {
+   # Find all .R files recursively
+   r_files <- list.files(path = path, pattern = "\\.R$", recursive = TRUE, full.names = TRUE)
+
+   if (length(r_files) == 0) {
+      message("No .R files found in the specified path.")
+      return(invisible(NULL))
+   }
+
+   for (file in r_files) {
+      tryCatch({
+         # Read the file content
+         content <- readLines(file, warn = FALSE)
+
+         # Replace str1 with str2
+         modified_content <- gsub(str1, str2, content, fixed = TRUE) # use fixed=TRUE for literal string replacement
+
+         # Write the modified content back to the file
+         writeLines(modified_content, file)
+
+         message(paste("Replaced '", str1, "' with '", str2, "' in file:", file))
+      }, error = function(e) {
+         warning(paste("Error processing file:", file, "-", e$message))
+      })
+   }
+}
+
+# Example usage (replace with your actual path and strings)
+# replace_string_in_r_files(path = "./my_r_project", str1 = "old_variable", str2 = "new_variable")
+
+#Example usage with special characters.
+#replace_string_in_r_files(path = "./my_r_project", str1 = "old.variable$", str2 = "new.variable")
+
+#Example usage with regex special characters that are handled by fixed=TRUE.
+#replace_string_in_r_files(path = "./my_r_project", str1 = "old.variable\\$", str2 = "new.variable")
+
+#Example usage with regex, without fixed=TRUE.
+#replace_string_in_r_files(path = "./my_r_project", str1 = "old\\.variable\\$", str2 = "new.variable")
+
+# Explanation:
+#    * replace_string_in_r_files(path, str1, str2):
+#    * This defines the function with the specified arguments.
+# * r_files <- list.files(...):
+#    * list.files() is used to find all files within the given path.
+# * pattern = "\\.R$" filters for files ending with ".R". The double backslash is crucial to escape the dot, as a single dot in regular expressions means "any character." The $ means the end of the string.
+# * recursive = TRUE searches in all subfolders.
+# * full.names = TRUE returns the full file paths.
+# * if (length(r_files) == 0):
+#    * Checks if any .R files were found and prints a message if none exist.
+# * for (file in r_files):
+#    * Loops through each found .R file.
+# * tryCatch({...}, error = function(e) {...}):
+#    * Handles potential errors during file reading or writing.
+# * content <- readLines(file, warn = FALSE):
+#    * Reads the content of the file into a character vector. warn = FALSE suppresses warnings about incomplete final lines.
+# * modified_content <- gsub(str1, str2, content, fixed = TRUE):
+#    * gsub() is used to replace all occurrences of str1 with str2 in the content.
+# * fixed = TRUE is very important! It treats str1 and str2 as literal strings, meaning that any special regex characters within them are not interpreted as regex. If you want to use regex, remove fixed=TRUE and properly escape any regex characters in str1.
+# * writeLines(modified_content, file):
+#    * Writes the modified content back to the original file.
+# * message(...) and warning(...):
+#    * Provides feedback to the user about the progress or any errors encountered.
+# * invisible(NULL):
+#    * returns null, but does not print it to the console.
+# Important considerations:
+#    * Backup: Before running this function, make a backup of your .R files, as it will directly modify them.
+# * Regex: If you need to use regular expressions for more complex string matching, remove fixed = TRUE from the gsub() call and ensure that str1 is a valid regular expression. You may need to escape special characters.
+# * Permissions: Ensure that you have write permissions to the files and directories in the specified path.
+# * Testing: Test the function on a small subset of files before running it on your entire project.
+
+
+

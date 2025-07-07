@@ -58,7 +58,7 @@ CreateProject <- function(projId, loc = getwd(), msgPath = character(0L)) {
          )
          WriteProjFile(projId, projInfoFields, projRoot)
          # Create sub-folders under project root.
-         for (subdir in c("R", "data", "batch", "export", "data-raw", "db")) {
+         for (subdir in c("R", "data", "batch", "export", "data-raw")) {
             dir.create(file.path(projRoot, subdir))
          }
          paste0("'", projId, "' project is created in '", loc, "'")
@@ -192,11 +192,12 @@ DeployObject <- function(pkgName, objectType, overwrite = TRUE) {
                 if(ow | !objExists) {
                    cat("-- Deploying", objName, "...")
                    eval(expr = parse(text = paste0("obj <- ", funcName, "()")))
-                   if (length(GetId(obj)) == 0) {
-                      SetId(obj) <- objName
-                   } else if (GetId(obj) != objName) {
-                      stop(paste0("Object deployed by function ", funcName, " has an inconsistent identifier ", GetId(obj)))
-                   }
+                   # if (length(GetId(obj)) == 0) {
+                   #    SetId(obj) <- objName
+                   # } else if (GetId(obj) != objName) {
+                   #    stop(paste0("Object deployed by function ", funcName, " has an inconsistent identifier ", GetId(obj)))
+                   # }
+                   SetId(obj) <- objName
                    eval(expr = parse(text = paste0(objName, " <- obj" )))
                    eval(expr = parse(text = paste0("save(", objName, ", file = 'data/", objName, ".rda')")))
                    cat("done", "\n")

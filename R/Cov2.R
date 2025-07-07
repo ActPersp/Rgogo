@@ -108,7 +108,6 @@ as.Cov2List <- function(dfCov) {
          for (s in slotsWithData) {
             slot(cov, s) <- switch (class(slot(cov, s)),
                                     "integer" = as.integer(dfCov[[r, s]]),
-                                    "S4" = as.Date(dfCov[[r, s]]),
                                     dfCov[[r, s]]
             )
          }

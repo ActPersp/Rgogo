@@ -82,7 +82,10 @@ setMethod(
    signature = "IPlan.End.Par",
    definition = function(object, cov, resultContainer) {
       resultContainer <- callNextMethod()
-      resultContainer <- Project(GetPUA(object), cov, resultContainer)
+      pua <- GetPUA(object)
+      if (!is.null(pua)) {
+         resultContainer <- Project(pua, cov, resultContainer)
+      }
       return(resultContainer)
    }
 )
