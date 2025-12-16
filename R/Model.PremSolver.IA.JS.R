@@ -98,7 +98,7 @@ setMethod(
       if (length(ageDiff) == 1) {
          issAge2 <- GetIssAge(cov) + ageDiff
       } else {
-         issAge2 <- arg[GetRiskClass(cov)] + GetIssAge(cov)
+         issAge2 <- ageDiff[GetRiskClass(cov)] + GetIssAge(cov)
       }
       return(issAge2)
    }

@@ -313,48 +313,29 @@ replace_string_in_r_files <- function(path, str1, str2) {
    }
 }
 
-# Example usage (replace with your actual path and strings)
-# replace_string_in_r_files(path = "./my_r_project", str1 = "old_variable", str2 = "new_variable")
+next_modal_date <- function(issue_date, current_date, mode = c("M", "Q", "S", "A")) {
+   suppressMessages(require(lubridate))
+   # Ensure dates are Date objects
+   issue_date <- as.Date(issue_date)
+   current_date <- as.Date(current_date)
+   stopifnot(current_date >= issue_date)
 
-#Example usage with special characters.
-#replace_string_in_r_files(path = "./my_r_project", str1 = "old.variable$", str2 = "new.variable")
+   # Match mode argument
+   mode <- match.arg(mode)
 
-#Example usage with regex special characters that are handled by fixed=TRUE.
-#replace_string_in_r_files(path = "./my_r_project", str1 = "old.variable\\$", str2 = "new.variable")
+   # Determine frequency in months
+   freq_months <- switch(mode,
+                         M = 1,
+                         Q = 3,
+                         S = 6,
+                         A = 12)
 
-#Example usage with regex, without fixed=TRUE.
-#replace_string_in_r_files(path = "./my_r_project", str1 = "old\\.variable\\$", str2 = "new.variable")
+   # Calculate number of complete periods since issue date
+   months_since_issue <- as.numeric(difftime(current_date, issue_date, units = "days")) / 28
+   n_periods <- ceiling(months_since_issue / freq_months)
 
-# Explanation:
-#    * replace_string_in_r_files(path, str1, str2):
-#    * This defines the function with the specified arguments.
-# * r_files <- list.files(...):
-#    * list.files() is used to find all files within the given path.
-# * pattern = "\\.R$" filters for files ending with ".R". The double backslash is crucial to escape the dot, as a single dot in regular expressions means "any character." The $ means the end of the string.
-# * recursive = TRUE searches in all subfolders.
-# * full.names = TRUE returns the full file paths.
-# * if (length(r_files) == 0):
-#    * Checks if any .R files were found and prints a message if none exist.
-# * for (file in r_files):
-#    * Loops through each found .R file.
-# * tryCatch({...}, error = function(e) {...}):
-#    * Handles potential errors during file reading or writing.
-# * content <- readLines(file, warn = FALSE):
-#    * Reads the content of the file into a character vector. warn = FALSE suppresses warnings about incomplete final lines.
-# * modified_content <- gsub(str1, str2, content, fixed = TRUE):
-#    * gsub() is used to replace all occurrences of str1 with str2 in the content.
-# * fixed = TRUE is very important! It treats str1 and str2 as literal strings, meaning that any special regex characters within them are not interpreted as regex. If you want to use regex, remove fixed=TRUE and properly escape any regex characters in str1.
-# * writeLines(modified_content, file):
-#    * Writes the modified content back to the original file.
-# * message(...) and warning(...):
-#    * Provides feedback to the user about the progress or any errors encountered.
-# * invisible(NULL):
-#    * returns null, but does not print it to the console.
-# Important considerations:
-#    * Backup: Before running this function, make a backup of your .R files, as it will directly modify them.
-# * Regex: If you need to use regular expressions for more complex string matching, remove fixed = TRUE from the gsub() call and ensure that str1 is a valid regular expression. You may need to escape special characters.
-# * Permissions: Ensure that you have write permissions to the files and directories in the specified path.
-# * Testing: Test the function on a small subset of files before running it on your entire project.
-
-
-
+   # Compute next modal date
+   modal_dates <- issue_date %m+% months((1:n_periods) * freq_months)
+   next_modal_date <- modal_dates[modal_dates > current_date][1]
+   return(next_modal_date)
+}
