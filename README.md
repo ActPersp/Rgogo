@@ -37,6 +37,3 @@ Common types of project that can be done with Rgogo include:
 
 * scenario testing
 
-## Rgogo Project Website
-
-Please visit [Rgogo project website](https://rmodel.io) for more information.
