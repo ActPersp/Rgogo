@@ -102,3 +102,51 @@ Simply using ```Rgogo``` to build and run a typical actuarial model does not req
 
 If you intend to extend or customize ```Rgogo``` functions extensively to meet your modeling needs, more advanced knowledge in R will be needed.  In particular, a good understanding of the R object-oriented programming S4 class system will be essential.
 
+
+## Other Related Packages
+
+The following packages may be of interest to you if you use Canadian or US mortality tables in your actuarial projects:
+
+#### `MortTables.CA`
+
+This package contains a collection of commonly used mortality tables published by Canadian Institute of Actuaries.
+
+#### `MortTables.US`
+
+This package contains a collection of commonly used mortality tables published by Society of Actuaries.
+
+To install these option packages, execute the following R commands:
+
+```R
+library(devtools)
+install_github(repo = "ActPersp/MortTables.CA")
+```
+or
+```R
+install_github(repo = "ActPersp/MortTables.US")
+```
+
+## Sample Projects
+
+The following sample projects are also available in GitHub.  You can clone them and test them out in your local computer:
+
+#### `LTPricing`
+
+This is a sample pricing project for level term insurance products.
+
+See the link https://github.com/ActPersp/LTPricing for the project source codes.
+
+#### `LTValuation`
+
+This is a sample valuation project for a block of level term insurance policies.  The valuation methodology used is based on 
+discounted cash flows (Policy Premium Method).
+
+See the link https://github.com/ActPersp/LTValuation for the project source codes.
+
+
+
+
+
+
+
+
