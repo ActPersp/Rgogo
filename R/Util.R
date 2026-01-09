@@ -339,3 +339,32 @@ next_modal_date <- function(issue_date, current_date, mode = c("M", "Q", "S", "A
    next_modal_date <- modal_dates[modal_dates > current_date][1]
    return(next_modal_date)
 }
+
+
+is_modal_date <- function(issue_date, current_date, mode = c("M", "Q", "S", "A")) {
+   suppressMessages(require(lubridate))
+   # Ensure dates are Date objects
+   issue_date <- as.Date(issue_date)
+   current_date <- as.Date(current_date)
+   stopifnot(current_date >= issue_date)
+
+   # Match mode argument
+   mode <- match.arg(mode)
+
+   # Determine frequency in months
+   freq_months <- switch(mode,
+                         M = 1,
+                         Q = 3,
+                         S = 6,
+                         A = 12)
+
+   # Calculate number of complete periods since issue date
+   months_since_issue <- as.numeric(difftime(current_date, issue_date, units = "days")) / 28
+   n_periods <- ceiling(months_since_issue / freq_months)
+
+   # Compute next modal date
+   modal_dates <- issue_date %m+% months((1:n_periods) * freq_months)
+   is_modal_date <- current_date %in% modal_dates
+   return(is_modal_date)
+}
+
